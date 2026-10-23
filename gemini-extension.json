@@ -1,0 +1,6 @@
+{
+  "name": "ponytail",
+  "version": "5.3.2",
+  "description": "CodeCraft is a Ponytail-compatible derivative with engineering guidance for coding agents.",
+  "contextFileName": "AGENTS.md"
+}

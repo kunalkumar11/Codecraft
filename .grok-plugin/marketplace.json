@@ -1,0 +1,16 @@
+{
+  "name": "ponytail",
+  "description": "CodeCraft is a Ponytail-compatible derivative with engineering guidance for AI coding agents.",
+  "owner": {
+    "name": "Dietrich Gebert",
+    "url": "https://github.com/DietrichGebert"
+  },
+  "plugins": [
+    {
+      "name": "ponytail",
+      "description": "CodeCraft adds practical engineering guidance while preserving Ponytail-compatible commands.",
+      "source": "./skills",
+      "category": "productivity"
+    }
+  ]
+}

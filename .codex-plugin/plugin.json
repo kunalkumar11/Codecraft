@@ -1,0 +1,32 @@
+{
+  "name": "ponytail",
+  "version": "5.3.2",
+  "description": "CodeCraft is a Ponytail-compatible derivative with engineering guidance for coding agents.",
+  "author": {
+    "name": "Dietrich Gebert",
+    "url": "https://github.com/DietrichGebert"
+  },
+  "homepage": "https://github.com/DietrichGebert/ponytail",
+  "repository": "https://github.com/DietrichGebert/ponytail",
+  "license": "MIT",
+  "keywords": ["yagni", "minimalism", "code-review", "productivity"],
+  "skills": "./skills/",
+  "hooks": "./hooks/claude-codex-hooks.json",
+  "interface": {
+    "displayName": "CodeCraft",
+    "shortDescription": "Engineering guidance for AI coding agents",
+    "longDescription": "Use existing project patterns, validate trust boundaries, and keep changes understandable and correct.",
+    "developerName": "Dietrich Gebert",
+    "category": "Productivity",
+    "capabilities": ["Instructions", "Lifecycle hooks"],
+    "websiteURL": "https://github.com/DietrichGebert/ponytail",
+    "defaultPrompt": [
+      "Use CodeCraft guidance for this task.",
+      "Review this diff for over-engineering.",
+      "Find the smallest correct implementation."
+    ],
+    "brandColor": "#111111",
+    "composerIcon": "./assets/codecraft-mark.svg",
+    "logo": "./assets/codecraft-mark.svg"
+  }
+}

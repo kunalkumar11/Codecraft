@@ -1,63 +1,109 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
   <title id="title">CodeCraft</title>
-  <desc id="desc">A continuous teal line forms a C with a golden anchor — CodeCraft: the smallest change that works.</desc>
-  <!-- Background rounded square -->
-  <rect width="128" height="128" rx="28" fill="#0D1B2A"/>
-  <!-- Subtle grid pattern -->
+  <desc id="desc">CodeCraft: the smallest change that fully solves the problem.</desc>
+
+  <!-- Definitions -->
   <defs>
-    <pattern id="grid" width="16" height="16" patternUnits="userSpaceOnUse">
-      <path d="M16 0 L0 0 0 16" fill="none" stroke="#1A3A5C" stroke-width="0.5"/>
-    </pattern>
+    <!-- Deep navy background -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A1628"/>
+      <stop offset="100%" stop-color="#0D1B2A"/>
+    </linearGradient>
+
+    <!-- Teal gradient for primary mark -->
     <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#00E5A0"/>
-      <stop offset="100%" stop-color="#00B894"/>
+      <stop offset="50%" stop-color="#00C996"/>
+      <stop offset="100%" stop-color="#00A884"/>
     </linearGradient>
+
+    <!-- Gold accent gradient -->
     <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFD700"/>
-      <stop offset="100%" stop-color="#F3B95F"/>
+      <stop offset="50%" stop-color="#E8C04F"/>
+      <stop offset="100%" stop-color="#CCA333"/>
     </linearGradient>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+
+    <!-- Subtle highlight gradient -->
+    <linearGradient id="highlightGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.12)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+
+    <!-- Soft glow filter -->
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
       <feMerge>
-        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
+
+    <!-- Subtle inner shadow for depth -->
+    <filter id="innerShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feOffset dx="0" dy="1.5"/>
+      <feGaussianBlur stdDeviation="1.5" result="offsetBlur"/>
+      <feComposite operator="out" in="SourceGraphic" in2="offsetBlur"/>
+      <feFlood flood-color="rgba(0,0,0,0.3)"/>
+      <feComposite operator="in" in2="offsetBlur"/>
+      <feComposite operator="over" in="SourceGraphic"/>
+    </filter>
   </defs>
-  <rect width="128" height="128" rx="28" fill="url(#grid)"/>
-  <!-- Main C shape - continuous line -->
-  <path d="M88 28
-           C74 28 62 38 62 52
-           C62 66 74 76 88 76
-           C102 76 114 66 114 52
-           C114 38 102 28 88 28"
-        fill="none"
-        stroke="url(#tealGrad)"
-        stroke-width="8"
-        stroke-linecap="round"
-        filter="url(#glow)"/>
-  <!-- Inner accent line -->
-  <path d="M80 32
-           C70 32 62 40 62 50
-           C62 60 70 68 80 68"
-        fill="none"
-        stroke="#0D1B2A"
-        stroke-width="3"
-        stroke-linecap="round"
-        opacity="0.6"/>
-  <!-- Golden anchor point (the "craft" - deliberate, precise) -->
-  <circle cx="92" cy="28" r="8" fill="url(#goldGrad)" filter="url(#glow)"/>
-  <!-- Small tick marks on the C - representing precision/measurement -->
-  <g stroke="#65D6BA" stroke-width="2" stroke-linecap="round" opacity="0.8">
-    <line x1="48" y1="52" x2="56" y2="52"/>
-    <line x1="96" y1="68" x2="104" y2="68"/>
-    <line x1="48" y1="76" x2="56" y2="76"/>
+
+  <!-- Background rounded square -->
+  <rect width="128" height="128" rx="24" fill="url(#bgGrad)"/>
+
+  <!-- Top highlight for depth -->
+  <rect width="128" height="128" rx="24" fill="url(#highlightGrad)"/>
+
+  <!-- Main symbol: A minimal "C" formed by a precise, continuous stroke
+       with a deliberate anchor point representing "craft" - intentional, measured -->
+
+  <!-- Outer C stroke - the continuous line of code -->
+  <path d="M88 26
+           C72 26 60 38 60 54
+           C60 70 72 82 88 82
+           C104 82 116 70 116 54
+           C116 38 104 26 88 26"
+       fill="none"
+       stroke="url(#tealGrad)"
+       stroke-width="7"
+       stroke-linecap="round"
+       filter="url(#softGlow)"/>
+
+  <!-- Inner refinement line - shows precision/craft -->
+  <path d="M82 30
+           C70 30 62 38 62 50
+           C62 62 70 70 82 70"
+       fill="none"
+       stroke="#0A1628"
+       stroke-width="2.5"
+       stroke-linecap="round"
+       opacity="0.5"/>
+
+  <!-- The anchor/dot - "craft": deliberate, precise, the smallest meaningful mark -->
+  <circle cx="94" cy="26" r="7" fill="url(#goldGrad)" filter="url(#softGlow)"/>
+
+  <!-- Subtle inner highlight on anchor -->
+  <circle cx="92" cy="24" r="2.5" fill="rgba(255,255,255,0.3)"/>
+
+  <!-- Micro measurement ticks - representing "smallest change" / precision -->
+  <g stroke="#00E5A0" stroke-width="1.8" stroke-linecap="round" opacity="0.6">
+    <!-- Left side ticks -->
+    <line x1="46" y1="54" x2="53" y2="54"/>
+    <line x1="46" y1="74" x2="53" y2="74"/>
+    <!-- Right side tick -->
+    <line x1="98" y1="70" x2="105" y2="70"/>
   </g>
-  <!-- Subtle corner brackets (code editor vibe) -->
-  <g stroke="#1A3A5C" stroke-width="1.5" opacity="0.5">
-    <path d="M18 18 L30 18 M18 18 L18 30"/>
-    <path d="M110 18 L98 18 M110 18 L110 30"/>
-    <path d="M18 110 L30 110 M18 110 L18 98"/>
-    <path d="M110 110 L98 110 M110 110 L110 98"/>
+
+  <!-- Editor corner brackets - subtle, code-editor aesthetic -->
+  <g stroke="#1A3A5C" stroke-width="1.2" opacity="0.35">
+    <path d="M20 20 L34 20 M20 20 L20 34"/>
+    <path d="M108 20 L94 20 M108 20 L108 34"/>
+    <path d="M20 108 L34 108 M20 108 L20 94"/>
+    <path d="M108 108 L94 108 M108 108 L108 94"/>
   </g>
+
+  <!-- Ultra-thin border for crisp edge at any scale -->
+  <rect x="0.5" y="0.5" width="127" height="127" rx="23.5" fill="none" stroke="rgba(0,229,160,0.08)" stroke-width="1"/>
 </svg>

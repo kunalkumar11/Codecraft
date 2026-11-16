@@ -69,37 +69,6 @@ node --test tests/commands.test.js
 
 ---
 
-## 🎮 Demo Script (for presentation)
-
-```bash
-# 1. Show the help card
-/codecraft-help
-
-# 2. Toggle modes
-/codecraft lite    # minimal: build what's asked, name lazier alternative
-/codecraft         # full (default): YAGNI → stdlib → native → one-liner → minimum
-/codecraft ultra   # also questions the requirement before building
-/codecraft off     # disable; resume anytime with /codecraft
-
-# 3. Review a change (make a bad change first, then:)
-/codecraft-review
-# → Shows: Must fix / Should fix / Nice to have with concrete cases
-
-# 4. Audit whole repo
-/codecraft-audit
-# → Ranked findings across the entire codebase
-
-# 5. Show technical debt ledger
-/codecraft-debt
-# → Every `shortcut:` comment with ceiling + upgrade path
-
-# 6. Show benchmark impact
-/codecraft-gain
-# → 53% less code, 45% fewer tokens, 26% less cost, 41% faster
-```
-
----
-
 ## ⚙️ Configuration
 
 | Variable | Config Key | Default | Notes |

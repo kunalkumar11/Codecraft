@@ -20,11 +20,11 @@ Source: `benchmarks/results/2026-10-07-agentic.md` and the README.
 
 ## Scoreboard
 
-Render plain ASCII bars. The bar length shows codecraft as a share of the
+Render plain ASCII bars. The bar length shows CodeCraft as a share of the
 no-skill baseline; the label carries the exact figure:
 
 ```
-  codecraft gain           benchmark · 39 tasks × 5 runs · Opus 5.5
+  CodeCraft gain           benchmark · 39 tasks × 5 runs · Opus 5.5
 
   no-skill        ████████████████████  100%
   Lines of code   █████████···········   47%   ▼ 53%
@@ -34,8 +34,8 @@ no-skill baseline; the label carries the exact figure:
   Hidden checks passed   97%  (no-skill 96%)
   Tests where the logic needs one   98%  (no-skill 68%)
 
-  This repo:  /codecraft-debt  (shortcuts you deferred)
-              /codecraft-audit (what's still cuttable)
+  This repo:  /CodeCraft-debt  (shortcuts you deferred)
+              /CodeCraft-audit (what's still cuttable)
 ```
 
 ## Honesty boundary
@@ -43,7 +43,7 @@ no-skill baseline; the label carries the exact figure:
 These are benchmark averages, not this repo. NEVER print a per-repo savings
 number ("you saved X lines/tokens here"): the unbuilt version was never
 written, so there is no real baseline to subtract from in a live repo. The
-only real per-repo figures come from `/codecraft-debt` (a counted ledger), and
+only real per-repo figures come from `/CodeCraft-debt` (a counted ledger), and
 this card points there instead of inventing one.
 
 ## Boundaries

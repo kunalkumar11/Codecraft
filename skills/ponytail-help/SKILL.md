@@ -52,7 +52,7 @@ Default mode = `full`, auto-active every session. Change it:
 
 **Environment variable** (highest priority):
 ```bash
-export PONYTAIL_DEFAULT_MODE=ultra
+export CODECRAFT_DEFAULT_MODE=ultra
 ```
 
 **Config file** (`~/.config/ponytail/config.json`, Windows: `%APPDATA%\ponytail\config.json`):

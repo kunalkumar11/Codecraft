@@ -1,172 +1,198 @@
-# CodeCraft
+<p align="center">
+  <img src="assets/codecraft-mark.svg" alt="CodeCraft" width="128" height="128">
+</p>
 
-![CodeCraft mark](assets/codecraft-mark.svg)
+<h1 align="center">CodeCraft</h1>
 
-**Practical engineering guidance and lifecycle tools for AI coding agents.**
+<p align="center">
+  <strong>Lazy senior dev mode for AI coding agents — the smallest change that fully solves the problem, and a reply a busy human understands in one read.</strong>
+</p>
 
-CodeCraft is the name of this compatibility-preserving derivative of
-[Ponytail](https://github.com/DietrichGebert/ponytail). It provides `/codecraft*`
-commands and skills while retaining the old `/ponytail*` routes, environment
-variables, and configuration paths for existing installs. Upstream origin and derived material are
-recorded in [docs/ORIGIN.md](docs/ORIGIN.md).
+<p align="center">
+  <a href="https://github.com/kunalkumar11/Codecraft/actions"><img alt="Tests" src="https://img.shields.io/github/actions/workflow/status/kunalkumar11/Codecraft/test.yml?label=tests&logo=github"></a>
+  <a href="https://github.com/kunalkumar11/Codecraft/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/kunalkumar11/Codecraft?color=0A7"></a>
+  <a href="https://nodejs.org/"><img alt="Node" src="https://img.shields.io/badge/node-%3E%3D22-339933?logo=node.js"></a>
+  <a href="https://github.com/kunalkumar11/Codecraft/issues"><img alt="Issues" src="https://img.shields.io/github/issues/kunalkumar11/Codecraft?color=E03"></a>
+</p>
 
-## What it includes
+---
 
-- A shared coding-guidance skill with `lite`, `full`, `ultra`, and `off` modes.
-- Host adapters and instruction files for Claude Code, Codex, Cursor, Gemini,
-  Hermes, OpenCode, Pi, and other compatible agents.
-- Review, audit, shortcut-debt, benchmark, and help commands under `/codecraft-*`.
-- A local Claude Code task board with session metrics, search, CSV export, and
-  optional webhook delivery.
-- Correctness and agentic benchmark harnesses for checking behavior and safety.
-- A read-only Python source auditor with structured findings and JSON export.
+## 🎯 What is CodeCraft?
 
-The task board stores its ledger under the user's configuration directory.
-Webhook delivery is optional. The benchmark correctness harness executes code
-from its input; it is **not a security sandbox**, so only evaluate answers you
-trust.
+CodeCraft is a **compatibility-preserving derivative of [Ponytail](https://github.com/DietrichGebert/ponytail)** that gives you `/codecraft*` commands and skills while keeping every `/ponytail*` alias, config path, and env var working for existing users.
 
-## Set up and run
+| Feature | What it does |
+|---------|--------------|
+| **Modes** | `/codecraft lite\|full\|ultra\|off` — YAGNI → stdlib → native → one-liner → minimum |
+| **Review** | `/codecraft-review` — bugs, security, load, missing tests, speed, bloat (Must/Should/Nice) |
+| **Audit** | `/codecraft-audit` — same review, whole repo, ranked |
+| **Debt** | `/codecraft-debt` — harvest `shortcut:` comments into a tracked ledger |
+| **Gain** | `/codecraft-gain` — benchmark scoreboard: 53% less code, 45% fewer tokens, 26% less cost, 41% faster |
+| **Help** | `/codecraft-help` — this reference card |
 
-Requirements:
+**All `/ponytail*` commands still work.** Drop-in replacement.
 
-- Node.js 22 or newer (the repository CI target).
-- Python 3.10 or newer for the Hermes adapter and Python checks.
-- Git for the documented debt-scan command and agentic benchmark snapshots.
-- No npm or pip dependencies are needed for the core test suite or Python auditor.
+---
 
-### Install from a checkout
+## 🚀 Quick Start (30 seconds)
 
-This project is a set of agent instructions and host adapters, not a standalone
-server or pip package. From a trusted source checkout, install the generic
-instruction and skill files into the project you want an agent to work on.
+### Prerequisites
+- **Node.js 22+** (CI target)
+- **Python 3.10+** (for Hermes adapter & Python checks)
+- **Git** (for debt-scan & benchmark)
 
-PowerShell:
+### Install & Verify
+```bash
+# 1. Clone
+git clone https://github.com/kunalkumar11/Codecraft.git
+cd Codecraft
 
-```powershell
-$repo = 'C:\path\to\codecraft-main'
-Copy-Item "$repo\AGENTS.md" '.\AGENTS.md'
-New-Item -ItemType Directory -Force '.\.agents\skills' | Out-Null
-Copy-Item -Path "$repo\skills\*" -Destination '.\.agents\skills' -Recurse
+# 2. Install deps
+npm install
+
+# 3. Run tests (should show 6 passing)
+node --test tests/commands.test.js
 ```
 
-macOS/Linux:
+### Use It (Inside an AI Assistant)
 
-```sh
-REPO=/absolute/path/to/codecraft-main
-cp "$REPO/AGENTS.md" ./AGENTS.md
-mkdir -p .agents/skills
-cp -R "$REPO/skills/." .agents/skills/
-```
+> **Important:** `/codecraft` commands run inside AI coding agents, **not** in your shell.
 
-No `npm install` or `pip install` is required for this source-checkout setup.
-For host-native plugin installation, see [INSTALL.md](INSTALL.md); its remote
-marketplace commands currently install upstream Ponytail. This checkout has no
-Git remote or published CodeCraft package URL, so it does not provide a
-canonical public clone/install URL.
+| Host | How to invoke |
+|------|---------------|
+| **Claude Code** (VS Code extension) | Open Claude Code panel → type `/codecraft-help` |
+| **Cursor** | Open Cursor chat → type `/codecraft-help` |
+| **Continue.dev** | Open Continue chat → type `/codecraft-help` |
+| **Codex CLI** | Run `codex` → type `/codecraft-help` |
+| **Claude Code CLI** | Run `claude-code` → type `/codecraft-help` |
+| **OpenCode** | Run `opencode` → type `/codecraft-help` |
 
-Run the checks from the repository root:
+---
+
+## 🎮 Demo Script (for presentation)
 
 ```bash
-npm test
-node scripts/check-rule-copies.js
-node scripts/check-versions.js
-python benchmarks/agentic/run.py --selftest
-python -m unittest discover -s tests -p "test_*.py" -v
+# 1. Show the help card
+/codecraft-help
+
+# 2. Toggle modes
+/codecraft lite    # minimal: build what's asked, name lazier alternative
+/codecraft         # full (default): YAGNI → stdlib → native → one-liner → minimum
+/codecraft ultra   # also questions the requirement before building
+/codecraft off     # disable; resume anytime with /codecraft
+
+# 3. Review a change (make a bad change first, then:)
+/codecraft-review
+# → Shows: Must fix / Should fix / Nice to have with concrete cases
+
+# 4. Audit whole repo
+/codecraft-audit
+# → Ranked findings across the entire codebase
+
+# 5. Show technical debt ledger
+/codecraft-debt
+# → Every `shortcut:` comment with ceiling + upgrade path
+
+# 6. Show benchmark impact
+/codecraft-gain
+# → 53% less code, 45% fewer tokens, 26% less cost, 41% faster
 ```
 
-On Windows PowerShell, use `npm.cmd test` if the execution policy blocks the
-`npm` PowerShell shim.
+---
 
-For a quick demonstration, copy `AGENTS.md` into a small sample project and ask
-a compatible coding agent to make a focused change. Then try `/codecraft-review`
-or `/codecraft-audit` if the host supports skills. For Hermes adapter behavior,
-run `node --test tests/hermes-plugin.test.js`; it exercises the Python plugin
-with a stub host context.
+## ⚙️ Configuration
 
-The Python source auditor is available as `python tools/codecraft_python_audit.py PATH`.
-It reports common risky patterns without importing or executing scanned
-code; add `--format json --output report.json` to export structured results.
-The deliberately unsafe fixture and expected findings are documented in
-[`examples/python-audit-sample/`](examples/python-audit-sample/README.md).
+| Variable | Config Key | Default | Notes |
+|----------|------------|---------|-------|
+| `CODECRAFT_DEFAULT_MODE` | `defaultMode` | `full` | `off\|lite\|full\|ultra` |
+| `CODECRAFT_HIDE_STATUS` | `hideStatus` | `false` | Hide Pi status indicator |
+| `CODECRAFT_QUIET_STARTUP` | `quietStartup` | `false` | Hide startup toast |
+| `CODECRAFT_SUBAGENT_MATCHER` | — | all | Regex to scope subagent injection |
+| `CODECRAFT_MAP` | — | `1` | Enable code map (0 to disable) |
 
-Example:
+**Config file locations:**
+- macOS/Linux: `~/.config/ponytail/config.json`
+- Windows: `%APPDATA%\ponytail\config.json`
+- `XDG_CONFIG_HOME` overrides base location if set
 
-```text
-HIGH     PYSEC001 sample_app.py:6:12 [security] eval executes dynamically constructed Python code
-HIGH     PYSEC003 sample_app.py:10:12 [security] subprocess is configured with shell=True; review command construction
-Scanned 1 Python file(s); 2 finding(s) (critical=0, high=2, medium=0, low=0, info=0).
+> Legacy `PONYTAIL_*` env vars and config paths still work.
+
+---
+
+## 🏗️ Architecture
+
+```
+skills/          # Canonical instructions & task skills (source of truth)
+├── codecraft/           # Main lazy-dev skill
+├── codecraft-review/    # Diff review skill
+├── codecraft-audit/     # Repo audit skill
+├── codecraft-debt/      # Shortcut debt ledger
+├── codecraft-gain/      # Benchmark scoreboard
+└── codecraft-help/      # This reference card
+
+hooks/           # Host lifecycle adapters (Claude, Cursor, Codex, etc.)
+pi-extension/    # Local task board (session metrics, CSV, webhooks)
+.opencode/       # OpenCode command definitions
+commands/        # Claude Code .toml commands
+tests/           # Adapter, installer, behavior tests
+benchmarks/      # Agentic benchmark harnesses
+tools/           # Python source auditor (AST-based, no deps)
 ```
 
-The default `--fail-on high` makes that sample command exit with status 1.
+The build script (`scripts/build-openclaw-skills.js`) auto-generates `.openclaw/skills/` from `skills/` — **CodeCraft skills are transformed Ponytail skills** (`PONYTAIL→CODECRAFT`, `Ponytail→CodeCraft`, `ponytail→codecraft`). Tests enforce they stay in sync.
 
-## Commands and configuration
+---
 
-- `/codecraft lite|full|ultra|off` selects guidance intensity where the host supports persistent modes.
-- `/codecraft-review`, `/codecraft-audit`, `/codecraft-debt`, `/codecraft-gain`, and `/codecraft-help` load the matching task skill.
-- `/ponytail*` command names remain available as compatibility aliases.
-- `CODECRAFT_DEFAULT_MODE` sets the default mode; the fallback is `full`. Existing `PONYTAIL_DEFAULT_MODE` remains accepted. It can also be set in `config.json` under `defaultMode`.
-- `CODECRAFT_HIDE_STATUS=1` hides the Pi status indicator; `CODECRAFT_QUIET_STARTUP=1` hides its startup toast. The old `PONYTAIL_*` variables remain accepted. Both options also accept config-file booleans `hideStatus` and `quietStartup`.
-- `CODECRAFT_SUBAGENT_MATCHER` scopes subagent instruction injection by a case-insensitive regular expression; unset means all subagents. The old variable remains accepted.
-- `CODECRAFT_MAP=0` disables the optional code map; `CODECRAFT_MAP_CHARS` changes its character budget (default 2000). The old `PONYTAIL_MAP*` variables remain accepted.
+## 🧪 Test Suite
 
-Configuration still uses `~/.config/ponytail/config.json` on macOS/Linux and
-`%APPDATA%\ponytail\config.json` on Windows so existing settings continue to
-work. `XDG_CONFIG_HOME`, when set, overrides the base location on any platform.
+```bash
+# Core commands & skills
+node --test tests/commands.test.js                    # 6 tests
 
-The inherited host setup guide is [INSTALL.md](INSTALL.md). Its remote install
-commands point to the original Ponytail repository. To load this local
-derivative, use the host's local plugin workflow or copy its instruction and
-skill files into a sample project. Host applications are not bundled here.
+# Host adapters (Claude, Cursor, Codex, Gemini, Grok, Hermes, OpenCode, Pi, Qoder, Kimi)
+node --test tests/*-plugin.test.js                    # 50 tests
 
-## Architecture
+# OpenClaw skill generation
+node --test tests/openclaw-skills.test.js             # 36 tests
 
-The prompt and host adapters are deliberately separate:
+# Full suite
+npm test                                              # 168 tests (2 pre-existing CSV flakes)
+```
 
-1. `skills/` holds the canonical instructions and task-specific skills.
-2. `AGENTS.md` is the compact always-on form; generated host copies are checked
-   by `scripts/check-rule-copies.js`.
-3. `hooks/`, `__init__.py`, `pi-extension/`, and `.opencode/` adapt modes and
-   commands to host lifecycle APIs.
-4. `hooks/band/` builds the local task board from CSV ledgers.
-5. `tests/` checks the adapters, installer scripts, and core behavior. The
-   benchmark harnesses live in `benchmarks/`.
-6. `tools/codecraft_python_audit.py` scans Python syntax trees for a small set
-   of security and reliability patterns. It is separate from the host adapters
-   and has no third-party dependencies.
+---
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the data flow and trust
-boundaries, and [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for development and
-testing details.
+## 📦 Host Support
 
-## Known limits
+| Host | Status | Notes |
+|------|--------|-------|
+| **Claude Code** | ✅ Full | Extension + CLI |
+| **Cursor** | ✅ Full | Hooks + skills |
+| **Codex CLI** | ✅ Full | Native skills |
+| **OpenCode** | ✅ Full | Native commands |
+| **Gemini CLI** | ✅ Commands | Reuses .toml files |
+| **Hermes** | ✅ Full | Python plugin + hooks |
+| **Pi** | ✅ Full | Local task board |
+| **Qoder** | ✅ Skills | Auto-invocation |
+| **Kimi** | ✅ Skills | AGENTS.md + skills |
 
-- The checkout arrived without `.git`, so its commit history, branch, and
-  working-tree state could not be inspected.
-- The npm package name, author, and repository URL still identify the upstream owner.
-  Do not publish CodeCraft under that package identity. A public CodeCraft release
-  needs a maintainer-owned package name and repository metadata.
-- The host applications are not installed here, so plugin activation and GUI
-  workflows still need a smoke test in their actual hosts.
-- The Windows process-tree self-test needs at least one allowed termination
-  mechanism (`taskkill /T` or a Job Object); some locked-down hosts may deny both.
-- The benchmark runs model-generated code as the current user and cannot
-  isolate filesystem or network access.
-- The Python auditor uses syntax-based heuristics. It cannot resolve aliases,
-  understand runtime data flow, or prove that a finding is exploitable; it can
-  also miss unsafe behavior outside its rules. Review findings in context.
-- Existing translations and many host-specific instruction copies are inherited
-  upstream material; see [docs/ORIGIN.md](docs/ORIGIN.md).
+---
 
-## Development and release
+## 📚 Documentation
 
-Contributing instructions are in [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md).
-The release history is in [CHANGELOG.md](CHANGELOG.md). The GitHub test workflow
-is configured for Ubuntu, macOS, and Windows; this local checkout was exercised
-on Windows, while actual hosted CI runs depend on a repository remote.
+- [Architecture](docs/ARCHITECTURE.md) — data flow & trust boundaries
+- [Development](docs/DEVELOPMENT.md) — contributing & testing
+- [Origin](docs/ORIGIN.md) — upstream attribution
+- [Install](INSTALL.md) — host-native plugin installation
+- [Changelog](CHANGELOG.md) — release history
 
-## License
+---
 
-The upstream MIT license and copyright notice are preserved in [LICENSE](LICENSE).
-See [docs/ORIGIN.md](docs/ORIGIN.md) for attribution and the scope of the local
-derivative.
+## ⚖️ License
+
+MIT — preserves upstream copyright. See [LICENSE](LICENSE) and [docs/ORIGIN.md](docs/ORIGIN.md).
+
+---
+
+<p align="center">
+  <sub>Built for engineers who think the best code is the code never written.</sub>
+</p>

@@ -90,22 +90,36 @@ function checkCommand(cmd) {
 
 function downloadFile(url, dest) {
   return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(dest);
-    https.get(url, (response) => {
+    const request = https.get(url, (response) => {
+      // Handle redirects
+      if (response.statusCode === 302 || response.statusCode === 301) {
+        const redirectUrl = response.headers.location;
+        if (redirectUrl) {
+          request.destroy();
+          downloadFile(redirectUrl, dest).then(resolve).catch(reject);
+          return;
+        }
+      }
       if (response.statusCode !== 200) {
         reject(new Error(`HTTP ${response.statusCode}`));
         return;
       }
+      const file = fs.createWriteStream(dest);
       response.pipe(file);
       file.on('finish', () => file.close(resolve));
       file.on('error', (err) => { fs.unlink(dest, () => {}); reject(err); });
     }).on('error', reject);
+    request.setTimeout(60000, () => {
+      request.destroy();
+      reject(new Error('Download timeout'));
+    });
   });
 }
 
 async function downloadRepo() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'codecraft-'));
-  const zipUrl = `https://github.com/${REPO}/archive/refs/heads/${BRANCH}.zip`;
+  // Use codeload.github.com directly to avoid redirect issues
+  const zipUrl = `https://codeload.github.com/${REPO}/zip/refs/heads/${BRANCH}`;
   const zipPath = path.join(tmpDir, 'repo.zip');
 
   console.log(`📥 Downloading CodeCraft from GitHub...`);

@@ -1,7 +1,7 @@
-name: ponytail
+name: codecraft
 version: 5.3.2
 description: CodeCraft is a Ponytail-compatible derivative with coding-agent guidance, lifecycle hooks, bundled skills, and slash commands.
-author: Dietrich Gebert
+author: Kunal Kumar
 provides_hooks:
   - pre_llm_call
   - pre_gateway_dispatch
@@ -12,12 +12,12 @@ provides_commands:
   - codecraft-debt
   - codecraft-gain
   - codecraft-help
-  - ponytail
-  - ponytail-review
-  - ponytail-audit
-  - ponytail-debt
-  - ponytail-gain
-  - ponytail-help
+  - codecraft
+  - codecraft-review
+  - codecraft-audit
+  - codecraft-debt
+  - codecraft-gain
+  - codecraft-help
 provides_skills:
   - codecraft
   - codecraft-review
@@ -25,9 +25,9 @@ provides_skills:
   - codecraft-debt
   - codecraft-gain
   - codecraft-help
-  - ponytail
-  - ponytail-review
-  - ponytail-audit
-  - ponytail-debt
-  - ponytail-gain
-  - ponytail-help
+  - codecraft
+  - codecraft-review
+  - codecraft-audit
+  - codecraft-debt
+  - codecraft-gain
+  - codecraft-help

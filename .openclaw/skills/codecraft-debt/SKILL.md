@@ -1,7 +1,7 @@
 ---
 name: codecraft-debt
 description: "CodeCraft shortcut comment ledger with the upgrade path for each deliberate deferral."
-homepage: https://github.com/DietrichGebert/ponytail
+homepage: https://github.com/kunalkumar11/Codecraft
 license: MIT
 ---
 

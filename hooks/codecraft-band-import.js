@@ -8,7 +8,7 @@ const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { StringDecoder } = require('string_decoder');
-const { getClaudeDir } = require('./ponytail-config');
+const { getClaudeDir } = require('./codecraft-config');
 
 // The band's columns (CSV_HEADER in hooks/band/metrics.ts; a test keeps the two equal).
 const CSV_HEADER = 'key,started,project,name,cost_usd,turns,agent_minutes,tokens_total,tokens_output,reuse_pct,reused,new,callers_open,tests,level,model';
@@ -210,7 +210,7 @@ function projectOf(cwd, cache) {
 }
 
 function ledgerDir() {
-  return path.join(process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config'), 'ponytail', 'band');
+  return path.join(process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config'), 'codecraft', 'band');
 }
 
 function run() {

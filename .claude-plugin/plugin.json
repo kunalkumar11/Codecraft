@@ -1,5 +1,5 @@
 {
-  "name": "ponytail",
+  "name": "codecraft",
   "version": "5.3.2",
   "description": "CodeCraft is a Ponytail-compatible derivative with engineering guidance for coding agents.",
   "author": {
@@ -15,7 +15,7 @@
     "ledger": {
       "type": "boolean",
       "title": "Task board",
-      "description": "After every turn, write this task's row (cost, turns, agent time, tokens, reuse, tests) to ~/.config/ponytail/band/<project>.csv for the board.",
+      "description": "After every turn, write this task's row (cost, turns, agent time, tokens, reuse, tests) to ~/.config/codecraft/band/<project>.csv for the board.",
       "default": true
     },
     "webhookUrl": {

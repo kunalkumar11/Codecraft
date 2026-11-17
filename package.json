@@ -1,26 +1,26 @@
 {
-  "name": "@dietrichgebert/ponytail",
+  "name": "@kunalkumar11/codecraft",
   "version": "5.3.2",
   "displayName": "CodeCraft",
-  "description": "CodeCraft is a compatibility-focused derivative of Ponytail for coding-agent guidance and lifecycle tools.",
-  "keywords": ["opencode-plugin", "opencode", "ponytail", "codecraft", "pi-package", "pi", "skills", "qoder"],
+  "description": "CodeCraft provides lazy senior dev guidance for AI coding agents — the smallest change that fully solves the problem.",
+  "keywords": ["opencode-plugin", "opencode", "codecraft", "pi-package", "pi", "skills", "qoder"],
   "license": "MIT",
   "author": {
-    "name": "Dietrich Gebert",
-    "url": "https://github.com/DietrichGebert"
+    "name": "Kunal Kumar",
+    "url": "https://github.com/kunalkumar11"
   },
-  "homepage": "https://github.com/DietrichGebert/ponytail",
+  "homepage": "https://github.com/kunalkumar11/Codecraft",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DietrichGebert/ponytail.git"
+    "url": "git+https://github.com/kunalkumar11/Codecraft.git"
   },
   "bugs": {
-    "url": "https://github.com/DietrichGebert/ponytail/issues"
+    "url": "https://github.com/kunalkumar11/Codecraft/issues"
   },
-  "main": "./.opencode/plugins/ponytail.mjs",
+  "main": "./.opencode/plugins/codecraft.mjs",
   "exports": {
-    ".": "./.opencode/plugins/ponytail.mjs",
-    "./plugin": "./.opencode/plugins/ponytail.mjs"
+    ".": "./.opencode/plugins/codecraft.mjs",
+    "./plugin": "./.opencode/plugins/codecraft.mjs"
   },
   "files": [
     "AGENTS.md",

@@ -31,14 +31,14 @@ test("parsePonytailCommand rejects review as a default (session-only mode, #377)
 });
 
 test("resolveSessionMode still honors review as a session mode (not a default)", () => {
-  const entries = [{ type: "custom", customType: "ponytail-mode", data: { mode: "review" } }];
+  const entries = [{ type: "custom", customType: "codecraft-mode", data: { mode: "review" } }];
   assert.equal(resolveSessionMode(entries, "full"), "review");
 });
 
 test("resolveSessionMode prefers latest persisted session mode", () => {
   const entries = [
-    { type: "custom", customType: "ponytail-mode", data: { mode: "lite" } },
-    { type: "custom", customType: "ponytail-mode", data: { mode: "ultra" } },
+    { type: "custom", customType: "codecraft-mode", data: { mode: "lite" } },
+    { type: "custom", customType: "codecraft-mode", data: { mode: "ultra" } },
   ];
 
   assert.equal(resolveSessionMode(entries, "full"), "ultra");
@@ -52,12 +52,12 @@ test("resolveSessionMode returns fallback when entries is not an array", () => {
 });
 
 test("readDefaultMode and writeDefaultMode use XDG config path", () => {
-  const tempDir = mkdtempSync(join(tmpdir(), "ponytail-config-"));
+  const tempDir = mkdtempSync(join(tmpdir(), "codecraft-config-"));
   const previousXdg = process.env.XDG_CONFIG_HOME;
-  const previousDefault = process.env.PONYTAIL_DEFAULT_MODE;
-  const configPath = join(tempDir, "ponytail", "config.json");
+  const previousDefault = process.env.CODECRAFT_DEFAULT_MODE;
+  const configPath = join(tempDir, "codecraft", "config.json");
   process.env.XDG_CONFIG_HOME = tempDir;
-  delete process.env.PONYTAIL_DEFAULT_MODE;
+  delete process.env.CODECRAFT_DEFAULT_MODE;
 
   try {
     assert.equal(readDefaultMode(), "full");
@@ -68,8 +68,8 @@ test("readDefaultMode and writeDefaultMode use XDG config path", () => {
   } finally {
     if (previousXdg === undefined) delete process.env.XDG_CONFIG_HOME;
     else process.env.XDG_CONFIG_HOME = previousXdg;
-    if (previousDefault === undefined) delete process.env.PONYTAIL_DEFAULT_MODE;
-    else process.env.PONYTAIL_DEFAULT_MODE = previousDefault;
+    if (previousDefault === undefined) delete process.env.CODECRAFT_DEFAULT_MODE;
+    else process.env.CODECRAFT_DEFAULT_MODE = previousDefault;
     rmSync(tempDir, { recursive: true, force: true });
   }
 });
@@ -77,25 +77,25 @@ test("readDefaultMode and writeDefaultMode use XDG config path", () => {
 test("readDefaultMode trims and normalizes whitespace in env and config values", () => {
   const tempDir = mkdtempSync(join(tmpdir(), "ponytail-default-normalize-"));
   const previousXdg = process.env.XDG_CONFIG_HOME;
-  const previousDefault = process.env.PONYTAIL_DEFAULT_MODE;
-  const configDir = join(tempDir, "ponytail");
+  const previousDefault = process.env.CODECRAFT_DEFAULT_MODE;
+  const configDir = join(tempDir, "codecraft");
   const configPath = join(configDir, "config.json");
   mkdirSync(configDir, { recursive: true });
   process.env.XDG_CONFIG_HOME = tempDir;
-  process.env.PONYTAIL_DEFAULT_MODE = "  FULL  ";
+  process.env.CODECRAFT_DEFAULT_MODE = "  FULL  ";
   writeFileSync(configPath, JSON.stringify({ defaultMode: "\tultra\n" }), "utf8");
 
   try {
     assert.equal(readDefaultMode(), "full");
-    process.env.PONYTAIL_DEFAULT_MODE = "\n lite \r\n";
+    process.env.CODECRAFT_DEFAULT_MODE = "\n lite \r\n";
     assert.equal(readDefaultMode(), "lite");
-    delete process.env.PONYTAIL_DEFAULT_MODE;
+    delete process.env.CODECRAFT_DEFAULT_MODE;
     assert.equal(readDefaultMode(), "ultra");
   } finally {
     if (previousXdg === undefined) delete process.env.XDG_CONFIG_HOME;
     else process.env.XDG_CONFIG_HOME = previousXdg;
-    if (previousDefault === undefined) delete process.env.PONYTAIL_DEFAULT_MODE;
-    else process.env.PONYTAIL_DEFAULT_MODE = previousDefault;
+    if (previousDefault === undefined) delete process.env.CODECRAFT_DEFAULT_MODE;
+    else process.env.CODECRAFT_DEFAULT_MODE = previousDefault;
     rmSync(tempDir, { recursive: true, force: true });
   }
 });
@@ -103,11 +103,11 @@ test("readDefaultMode trims and normalizes whitespace in env and config values",
 test("readQuietStartup resolves env var, config file, and default in that order", () => {
   const tempDir = mkdtempSync(join(tmpdir(), "ponytail-quiet-"));
   const previousXdg = process.env.XDG_CONFIG_HOME;
-  const previousEnv = process.env.PONYTAIL_QUIET_STARTUP;
-  const configDir = join(tempDir, "ponytail");
+  const previousEnv = process.env.CODECRAFT_QUIET_STARTUP;
+  const configDir = join(tempDir, "codecraft");
   const configPath = join(configDir, "config.json");
   process.env.XDG_CONFIG_HOME = tempDir;
-  delete process.env.PONYTAIL_QUIET_STARTUP;
+  delete process.env.CODECRAFT_QUIET_STARTUP;
 
   try {
     // No env, no config -> default false (toast still shows)
@@ -119,15 +119,15 @@ test("readQuietStartup resolves env var, config file, and default in that order"
     assert.equal(readQuietStartup(), true);
 
     // Env var overrides config
-    process.env.PONYTAIL_QUIET_STARTUP = "false";
+    process.env.CODECRAFT_QUIET_STARTUP = "false";
     assert.equal(readQuietStartup(), false);
-    process.env.PONYTAIL_QUIET_STARTUP = "1";
+    process.env.CODECRAFT_QUIET_STARTUP = "1";
     assert.equal(readQuietStartup(), true);
   } finally {
     if (previousXdg === undefined) delete process.env.XDG_CONFIG_HOME;
     else process.env.XDG_CONFIG_HOME = previousXdg;
-    if (previousEnv === undefined) delete process.env.PONYTAIL_QUIET_STARTUP;
-    else process.env.PONYTAIL_QUIET_STARTUP = previousEnv;
+    if (previousEnv === undefined) delete process.env.CODECRAFT_QUIET_STARTUP;
+    else process.env.CODECRAFT_QUIET_STARTUP = previousEnv;
     rmSync(tempDir, { recursive: true, force: true });
   }
 });
@@ -165,7 +165,7 @@ test("filterSkillBodyForMode keeps rule bullets that contain a colon", () => {
   // Regression: rule bullets outside the Intensity section (e.g. the
   // "No unrequested abstractions:" rule or the `shortcut:` comment convention)
   // contain a colon and must not be mistaken for mode-example lines.
-  const skillPath = new URL("../../skills/ponytail/SKILL.md", import.meta.url);
+  const skillPath = new URL("../../skills/codecraft/SKILL.md", import.meta.url);
   const body = readFileSync(skillPath, "utf8");
 
   const filtered = filterSkillBodyForMode(body, "full");

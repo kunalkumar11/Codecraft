@@ -9,14 +9,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
-const { filterSkillBodyForMode } = require('../hooks/ponytail-instructions');
+const { filterSkillBodyForMode } = require('../hooks/codecraft-instructions');
 
-const commands = ['ponytail', 'ponytail-review', 'ponytail-audit', 'ponytail-debt', 'ponytail-gain', 'ponytail-help',
-  'codecraft', 'codecraft-review', 'codecraft-audit', 'codecraft-debt', 'codecraft-gain', 'codecraft-help'];
+const commands = ['codecraft', 'codecraft-review', 'codecraft-audit', 'codecraft-debt', 'codecraft-gain', 'codecraft-help'];
 
 const root = path.join(__dirname, '..');
 
-// ponytail: probe once; on Windows `python3` is the Store-alias stub that fails
+// codecraft: probe once; on Windows `python3` is the Store-alias stub that fails
 // even when Python is installed, so fall back to `python` (mirrors benchmarks/correctness.js).
 let pythonCmd;
 function pythonExe() {
@@ -32,11 +31,11 @@ function pythonExe() {
 function python(script, env = {}) {
   const result = spawnSync(pythonExe(), ['-c', script], {
     cwd: root,
-    // Isolate from the developer's own ~/.config/ponytail and PONYTAIL_DEFAULT_MODE.
+    // Isolate from the developer's own ~/.config/codecraft and PONYTAIL_DEFAULT_MODE.
     env: {
       ...process.env,
       PONYTAIL_DEFAULT_MODE: '',
-      XDG_CONFIG_HOME: fs.mkdtempSync(path.join(os.tmpdir(), 'ponytail-config-')),
+      XDG_CONFIG_HOME: fs.mkdtempSync(path.join(os.tmpdir(), 'codecraft-config-')),
       ...env,
     },
     encoding: 'utf8',
@@ -56,7 +55,7 @@ test('Hermes plugin manifest matches runtime skills, hooks, commands, and packag
     .filter((name) => fs.existsSync(path.join(root, 'skills', name, 'SKILL.md')))
     .sort();
 
-  assert.match(manifest, /^name:\s*ponytail$/m);
+  assert.match(manifest, /^name:\s*codecraft$/m);
   assert.match(manifest, new RegExp(`^version:\\s*${packageJson.version}$`, 'm'));
   assert.match(manifest, new RegExp(`^author:\\s*${packageJson.author.name}$`, 'm'));
   assert.deepEqual(commands.filter((name) => manifest.includes(`  - ${name}`)), commands);
@@ -68,7 +67,7 @@ test('Hermes plugin manifest matches runtime skills, hooks, commands, and packag
 test('Hermes plugin registers CodeCraft skills and legacy Ponytail skill aliases', () => {
   const output = python(String.raw`
 import importlib.util, json, pathlib
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 class Ctx:
@@ -94,26 +93,20 @@ print(json.dumps({'skills': ctx.skills, 'hooks': ctx.hooks, 'commands': ctx.comm
     'codecraft-gain',
     'codecraft-help',
     'codecraft-review',
-    'ponytail',
-    'ponytail-audit',
-    'ponytail-debt',
-    'ponytail-gain',
-    'ponytail-help',
-    'ponytail-review',
   ]);
   assert.ok(data.skills.every(([, skillPath]) => skillPath.endsWith('/SKILL.md')));
   assert.ok(data.hooks.includes('pre_llm_call'));
-  assert.ok(data.commands.includes('ponytail'));
-  assert.ok(data.commands.includes('ponytail-review'));
+  assert.ok(data.commands.includes('codecraft'));
+  assert.ok(data.commands.includes('codecraft-review'));
   assert.ok(data.commands.includes('codecraft'));
   assert.ok(data.commands.includes('codecraft-review'));
 });
 
 test('Hermes plugin builds mode-aware injected context from the canonical skill', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ponytail-config-'));
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'codecraft-config-'));
   const output = python(String.raw`
 import importlib.util, json
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 ctx = mod.build_injected_context('ultra')
@@ -129,12 +122,12 @@ print(json.dumps({'ctx': ctx}))
 });
 
 test('Hermes mode config respects env, config file, off, and invalid command behavior', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ponytail-config-'));
-  fs.mkdirSync(path.join(tmp, 'ponytail'), { recursive: true });
-  fs.writeFileSync(path.join(tmp, 'ponytail', 'config.json'), JSON.stringify({ defaultMode: 'lite' }));
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'codecraft-config-'));
+  fs.mkdirSync(path.join(tmp, 'codecraft'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'codecraft', 'config.json'), JSON.stringify({ defaultMode: 'lite' }));
   const output = python(String.raw`
 import importlib.util, json
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 class Ctx:
@@ -145,9 +138,9 @@ class Ctx:
         self.commands[name] = handler
 ctx = Ctx()
 mod.register(ctx)
-status_before = ctx.commands['ponytail']('')
-invalid = ctx.commands['ponytail']('maximum')
-status_after = ctx.commands['ponytail']('')
+status_before = ctx.commands['codecraft']('')
+invalid = ctx.commands['codecraft']('maximum')
+status_after = ctx.commands['codecraft']('')
 print(json.dumps({
     'default': mod.build_injected_context(None),
     'off': mod.build_injected_context('off'),
@@ -165,15 +158,15 @@ print(json.dumps({
 });
 
 test('Hermes honors plain and BOM-prefixed default-mode config before LLM calls', (t) => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ponytail-config-'));
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'codecraft-config-'));
   t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
-  fs.mkdirSync(path.join(tmp, 'ponytail'));
+  fs.mkdirSync(path.join(tmp, 'codecraft'));
   for (const prefix of ['', '\uFEFF']) {
     for (const mode of ['lite', 'off']) {
-      fs.writeFileSync(path.join(tmp, 'ponytail', 'config.json'), prefix + JSON.stringify({ defaultMode: mode }));
+      fs.writeFileSync(path.join(tmp, 'codecraft', 'config.json'), prefix + JSON.stringify({ defaultMode: mode }));
       const output = python(String.raw`
 import importlib.util, json
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 print(json.dumps(mod._pre_llm_call()))
@@ -186,12 +179,12 @@ print(json.dumps(mod._pre_llm_call()))
 });
 
 test('Hermes treats review as a command, never a level', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ponytail-review-default-'));
-  fs.mkdirSync(path.join(tmp, 'ponytail'), { recursive: true });
-  fs.writeFileSync(path.join(tmp, 'ponytail', 'config.json'), JSON.stringify({ defaultMode: 'review' }));
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'codecraft-review-default-'));
+  fs.mkdirSync(path.join(tmp, 'codecraft'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'codecraft', 'config.json'), JSON.stringify({ defaultMode: 'review' }));
   const output = python(String.raw`
 import importlib.util, json, os
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 env_default = mod.build_injected_context(None)
@@ -210,10 +203,10 @@ print(json.dumps({
   assert.match(data.explicit_review, /CODECRAFT MODE ACTIVE — level: full/);
 });
 
-test('Hermes /ponytail command changes mode and pre_llm_call injects current context', () => {
+test('Hermes /codecraft command changes mode and pre_llm_call injects current context', () => {
   const output = python(String.raw`
 import importlib.util, json
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 class Ctx:
@@ -226,7 +219,7 @@ class Ctx:
         self.commands[name] = handler
 ctx = Ctx()
 mod.register(ctx)
-message = ctx.commands['ponytail']('ultra')
+message = ctx.commands['codecraft']('ultra')
 injected = ctx.hooks['pre_llm_call'](session_id='s1', user_message='build it', conversation_history=[], is_first_turn=False, model='m', platform='cli')
 print(json.dumps({'message': message, 'context': injected['context']}))
 `);
@@ -257,14 +250,14 @@ print(json.dumps({'mode': mode, 'rewritten': rewritten}))
 `);
   const data = JSON.parse(output);
   assert.match(data.mode, /CodeCraft mode set to ultra/);
-  assert.match(data.rewritten.text, /ponytail:codecraft-review/);
+  assert.match(data.rewritten.text, /codecraft:codecraft-review/);
   assert.match(data.rewritten.text, /User arguments: src\/app.py/);
 });
 
 test('Hermes pre_llm_call does not append the same ruleset to every persisted turn', () => {
   const output = python(String.raw`
 import importlib.util, json
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 first = mod._pre_llm_call(conversation_history=[])
@@ -291,12 +284,12 @@ print(json.dumps({'first': first, 'second': second, 'switched': switched, 'after
   assert.equal(data.after_switch, null);
 });
 
-test('Hermes /ponytail off reaches the model once, and a later level re-injects the ruleset', () => {
+test('Hermes /codecraft off reaches the model once, and a later level re-injects the ruleset', () => {
   // The ruleset from the first turn is replayed from api_content on every later
   // turn, and the command's reply goes to the user only, so off must be injected.
   const output = python(String.raw`
 import importlib.util, json
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 first = mod._pre_llm_call(conversation_history=[])
@@ -328,7 +321,7 @@ print(json.dumps({'nothing_persisted': nothing_persisted, 'off': off, 'still_off
 test('Hermes gateway rewrite respects slash access denial', () => {
   const output = python(String.raw`
 import importlib.util, json
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 class Source:
@@ -336,7 +329,7 @@ class Source:
     chat_id = 'c1'
     user_id = 'u1'
 class Event:
-    text = '/ponytail-review src/app.js'
+    text = '/codecraft-review src/app.js'
     source = Source()
 class Gateway:
     def _check_slash_access(self, source, command):
@@ -347,10 +340,10 @@ print(json.dumps(result))
   assert.equal(output, 'null');
 });
 
-test('Hermes bare /ponytail switches an off session on and only reports a running level (#639)', () => {
+test('Hermes bare /codecraft switches an off session on and only reports a running level (#639)', () => {
   const output = python(String.raw`
 import importlib.util, json
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 mod._current_mode = 'ultra'
@@ -370,25 +363,25 @@ print(json.dumps([running, kept, switched, mod._current_mode]))
 test('Hermes gateway rewrite preserves every skill command and ignores unrelated text', () => {
   const output = python(String.raw`
 import importlib.util, json
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 class Event:
     def __init__(self, text): self.text = text
 cases = {}
-for text in ['/ponytail-review x', '/ponytail-review\tpath', '/', '/   ', '/ponytail_audit repo', '/ponytail-debt', '/ponytail-help', '/status', 'hello']:
+for text in ['/codecraft-review x', '/codecraft-review\tpath', '/', '/   ', '/codecraft_audit repo', '/codecraft-debt', '/codecraft-help', '/status', 'hello']:
     cases[text] = mod.rewrite_gateway_command(event=Event(text))
 print(json.dumps(cases, sort_keys=True))
 `);
   const data = JSON.parse(output);
-  assert.match(data['/ponytail-review x'].text, /ponytail-review/);
-  assert.match(data['/ponytail-review\tpath'].text, /User arguments: path/);
+  assert.match(data['/codecraft-review x'].text, /codecraft-review/);
+  assert.match(data['/codecraft-review\tpath'].text, /User arguments: path/);
   assert.equal(data['/'], null);
   assert.equal(data['/   '], null);
-  assert.match(data['/ponytail_audit repo'].text, /ponytail-audit/);
-  assert.match(data['/ponytail_audit repo'].text, /repo/);
-  assert.match(data['/ponytail-debt'].text, /ponytail-debt/);
-  assert.match(data['/ponytail-help'].text, /ponytail-help/);
+  assert.match(data['/codecraft_audit repo'].text, /codecraft-audit/);
+  assert.match(data['/codecraft_audit repo'].text, /repo/);
+  assert.match(data['/codecraft-debt'].text, /codecraft-debt/);
+  assert.match(data['/codecraft-help'].text, /codecraft-help/);
   assert.equal(data['/status'], null);
   assert.equal(data.hello, null);
 });
@@ -397,11 +390,11 @@ test('Hermes mode filter does not drop a rule bullet whose label matches a mode 
   // Regression for the Hermes side of #571: a rule bullet shaped "- Full: ..."
   // has the same "label: text" shape as a worked example, but isn't one — it
   // must survive in every mode. Only the quoted `- lite: "..."`-style bullets
-  // are real per-mode examples. hooks/ponytail-instructions.js already guards
+  // are real per-mode examples. hooks/codecraft-instructions.js already guards
   // against this; the Hermes plugin filter had drifted and lost the same guard.
   const output = python(String.raw`
 import importlib.util, json
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 body = (
@@ -422,17 +415,17 @@ print(json.dumps({'filtered': mod._filter_skill_body_for_mode(body, 'ultra')}))
 test('Hermes mode filter stays in lockstep with the JS filter on the real skill body', () => {
   // The two filters are independent ports of the same contract (one shared
   // skill file, every host adapter trims it the same way). Diff them directly
-  // on skills/ponytail/SKILL.md instead of trusting the two implementations to
+  // on skills/codecraft/SKILL.md instead of trusting the two implementations to
   // stay in sync by hand.
-  const body = fs.readFileSync(path.join(root, 'skills', 'ponytail', 'SKILL.md'), 'utf8');
+  const body = fs.readFileSync(path.join(root, 'skills', 'codecraft', 'SKILL.md'), 'utf8');
   for (const mode of ['lite', 'full', 'ultra']) {
     const jsFiltered = filterSkillBodyForMode(body, mode);
     const pyFiltered = python(String.raw`
 import importlib.util, json
-spec = importlib.util.spec_from_file_location('ponytail_hermes_plugin', '__init__.py')
+spec = importlib.util.spec_from_file_location('codecraft_hermes_plugin', '__init__.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
-body = open('skills/ponytail/SKILL.md', encoding='utf-8').read()
+body = open('skills/codecraft/SKILL.md', encoding='utf-8').read()
 print(json.dumps(mod._filter_skill_body_for_mode(body, '${mode}')))
 `);
     assert.equal(JSON.parse(pyFiltered), jsFiltered, `filters diverge for mode "${mode}"`);

@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// ponytail — codebase map: what already exists, so "reuse first" costs no search.
+// codecraft — codebase map: what already exists, so "reuse first" costs no search.
 //
 // Lists the top-level functions, classes and exports of the project's source files, one line
 // per folder, inside a character budget. No model, no dependencies: `git ls-files` (or a short
 // directory walk) plus a regex per language. Tests, generated and vendored files are skipped;
 // shared code (utils, lib, services, components, hooks) is listed first when the budget is tight.
 //
-// ponytail: regex, not a parser. Misses nested or dynamic definitions; a tree-sitter index is the
+// codecraft: regex, not a parser. Misses nested or dynamic definitions; a tree-sitter index is the
 // upgrade if the map ever needs to be exact.
 
 const fs = require('fs');

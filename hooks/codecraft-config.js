@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// ponytail — shared configuration resolver
+// codecraft — shared configuration resolver
 //
 // Resolution order for default mode:
 //   1. PONYTAIL_DEFAULT_MODE environment variable
 //   2. Config file defaultMode field:
-//      - $XDG_CONFIG_HOME/ponytail/config.json (any platform, if set)
-//      - ~/.config/ponytail/config.json (macOS / Linux fallback)
-//      - %APPDATA%\ponytail\config.json (Windows fallback)
+//      - $XDG_CONFIG_HOME/codecraft/config.json (any platform, if set)
+//      - ~/.config/codecraft/config.json (macOS / Linux fallback)
+//      - %APPDATA%\codecraft\config.json (Windows fallback)
 //   3. 'full'
 
 const fs = require('fs');
@@ -33,16 +33,16 @@ function normalizePersistedMode(mode) {
   return normalizeMode(mode) || normalizeConfigMode(mode);
 }
 
-// "stop ponytail" / "normal mode" turn ponytail off, but only as a standalone
+// "stop codecraft" / "normal mode" turn codecraft off, but only as a standalone
 // command. Matching the phrase anywhere in the message turned it off mid-task
 // for ordinary requests like "add a normal mode toggle" — so require the whole
 // message to be the command, ignoring case and trailing punctuation.
 function isDeactivationCommand(text) {
   const t = String(text || '').trim().toLowerCase().replace(/[.!?\s]+$/, '');
-  return t === 'stop codecraft' || t === 'stop ponytail' || t === 'normal mode';
+  return t === 'stop codecraft' || t === 'stop codecraft' || t === 'normal mode';
 }
 
-// ponytail: only embed the plugin install path in a statusline shell command when
+// codecraft: only embed the plugin install path in a statusline shell command when
 // it's made of ordinary path characters. An allowlist beats escaping every shell's
 // metacharacters; a hostile clone path (quotes, &, $, backtick, ;, etc.) falls back
 // to manual setup instead. Allows : \ / for normal Windows and POSIX paths. Full
@@ -53,15 +53,15 @@ function isShellSafe(p) {
 
 function getConfigDir() {
   if (process.env.XDG_CONFIG_HOME) {
-    return path.join(process.env.XDG_CONFIG_HOME, 'ponytail');
+    return path.join(process.env.XDG_CONFIG_HOME, 'codecraft');
   }
   if (process.platform === 'win32') {
     return path.join(
       process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'),
-      'ponytail'
+      'codecraft'
     );
   }
-  return path.join(os.homedir(), '.config', 'ponytail');
+  return path.join(os.homedir(), '.config', 'codecraft');
 }
 
 function getConfigPath() {
@@ -69,7 +69,7 @@ function getConfigPath() {
 }
 
 function getClaudeDir() {
-  // ponytail: CLAUDE_CONFIG_DIR overrides ~/.claude, matching Claude Code.
+  // codecraft: CLAUDE_CONFIG_DIR overrides ~/.claude, matching Claude Code.
   return process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
 }
 
@@ -79,7 +79,7 @@ function getQoderDir() {
 
 function getDefaultMode() {
   // 1. Environment variable (highest priority)
-  // ponytail: a default must be a runtime level (off/lite/full/ultra); review is
+  // codecraft: a default must be a runtime level (off/lite/full/ultra); review is
   // a session-only mode, never a valid default (#377). Normalize here so values
   // with whitespace or mixed casing still resolve correctly.
   const envMode = normalizeMode(process.env.CODECRAFT_DEFAULT_MODE ?? process.env.PONYTAIL_DEFAULT_MODE);
@@ -121,7 +121,7 @@ function getQuietStartup() {
   }
 }
 
-// Hide the status-bar indicator while keeping ponytail active (#324).
+// Hide the status-bar indicator while keeping codecraft active (#324).
 // PONYTAIL_HIDE_STATUS=1 (or any truthy value; 0/false/empty mean "don't hide")
 // takes precedence, else config.hideStatus === true.
 function getHideStatus() {
@@ -139,7 +139,7 @@ function getHideStatus() {
 }
 
 function writeDefaultMode(mode) {
-  // ponytail: only a runtime level can be a default; review is session-only (#377).
+  // codecraft: only a runtime level can be a default; review is session-only (#377).
   const normalized = normalizeMode(mode);
   if (!normalized) return null;
 

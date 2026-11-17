@@ -11,8 +11,8 @@ const {
   normalizePersistedMode,
   isDeactivationCommand,
   writeDefaultMode,
-} = require("../hooks/ponytail-config.js");
-const { getPonytailInstructions, filterSkillBodyForMode } = require("../hooks/ponytail-instructions.js");
+} = require("../hooks/codecraft-config.js");
+const { getPonytailInstructions, filterSkillBodyForMode } = require("../hooks/codecraft-instructions.js");
 
 export { filterSkillBodyForMode };
 export const readDefaultMode = getDefaultMode;
@@ -35,7 +35,7 @@ export function resolveSessionMode(entries, fallbackMode = DEFAULT_MODE) {
 
   for (let i = entries.length - 1; i >= 0; i -= 1) {
     const entry = entries[i];
-    if (entry?.type !== "custom" || entry?.customType !== "ponytail-mode") continue;
+    if (entry?.type !== "custom" || entry?.customType !== "codecraft-mode") continue;
 
     const mode = normalizePersistedMode(entry?.data?.mode);
     if (mode) return mode;
@@ -49,7 +49,7 @@ export function parsePonytailCommand(text, defaultMode = DEFAULT_MODE, currentMo
   const normalizedText = String(text || "").trim().toLowerCase();
 
   if (!normalizedText) {
-    // Bare /ponytail switches ponytail on, or reports the level when it already is (#639).
+    // Bare /codecraft switches codecraft on, or reports the level when it already is (#639).
     if (currentMode && currentMode !== "off") return { type: "status" };
     return { type: "set-mode", mode: fallback === "off" ? "full" : fallback };
   }
@@ -59,7 +59,7 @@ export function parsePonytailCommand(text, defaultMode = DEFAULT_MODE, currentMo
   if (primary === "status") return { type: "status" };
 
   if (primary === "default") {
-    // ponytail: a default must be a runtime level; review is session-only (#377).
+    // codecraft: a default must be a runtime level; review is session-only (#377).
     const mode = normalizeMode(secondary);
     return mode ? { type: "set-default", mode } : { type: "invalid", reason: "invalid-default-mode" };
   }
@@ -70,7 +70,7 @@ export function parsePonytailCommand(text, defaultMode = DEFAULT_MODE, currentMo
 
 export { writeDefaultMode };
 
-export default function ponytailExtension(pi) {
+export default function codecraftExtension(pi) {
   let currentMode = DEFAULT_MODE;
   let configuredDefaultMode = getDefaultMode();
   let hideStatus = getHideStatus();
@@ -81,21 +81,21 @@ export default function ponytailExtension(pi) {
   function syncStatus(ctx) {
     if (ctx) lastCtx = ctx;
     const c = ctx || lastCtx;
-    // ponytail: hide the indicator but keep the ruleset active (#324).
+    // codecraft: hide the indicator but keep the ruleset active (#324).
     if (hideStatus) return;
     if (!c?.ui?.setStatus) return;
-    // ponytail: try/catch guards against pi-web theme proxy throwing before initTheme
+    // codecraft: try/catch guards against pi-web theme proxy throwing before initTheme
     let theme;
     try { theme = c.ui.theme; if (!theme?.fg) return; } catch { return; }
     if (currentMode === "off") {
-      c.ui.setStatus("ponytail", undefined);
+      c.ui.setStatus("codecraft", undefined);
       return;
     }
     const levelIcons = { lite: "🌿", full: "⚡", ultra: "🔥" };
     const icon = levelIcons[currentMode] || "";
     const label = currentMode.toUpperCase();
     const indicator = isActive ? theme.fg("accent", "●") : theme.fg("dim", "○");
-    c.ui.setStatus("ponytail", indicator + " ◇ " + theme.fg("muted", "codecraft: ") + theme.fg("text", icon + " " + label));
+    c.ui.setStatus("codecraft", indicator + " ◇ " + theme.fg("muted", "codecraft: ") + theme.fg("text", icon + " " + label));
   }
 
   const setMode = (mode, ctx) => {
@@ -103,7 +103,7 @@ export default function ponytailExtension(pi) {
     if (!normalized) return;
 
     currentMode = normalized;
-    pi.appendEntry("ponytail-mode", { mode: normalized });
+    pi.appendEntry("codecraft-mode", { mode: normalized });
     syncStatus(ctx);
     ctx?.ui?.notify?.(`CodeCraft mode set to ${normalized}.`, "info");
   };
@@ -114,7 +114,7 @@ export default function ponytailExtension(pi) {
 
     // pi.sendUserMessage does not expand skill commands on its own, so without
     // expandPromptTemplates the alias lands as the literal text
-    // "/skill:ponytail-review" and the skill body never reaches the agent.
+    // "/skill:codecraft-review" and the skill body never reaches the agent.
     if (ctx?.isIdle?.() === false) {
       pi.sendUserMessage(message, { expandPromptTemplates: true, deliverAs: "followUp" });
       ctx?.ui?.notify?.(`${skillName} queued as follow-up.`, "info");
@@ -156,7 +156,7 @@ export default function ponytailExtension(pi) {
       ctx?.ui?.notify?.("Unknown or unsupported /codecraft mode.", "warning");
   };
 
-  for (const name of ["codecraft", "ponytail"]) {
+  for (const name of ["codecraft", "codecraft"]) {
     pi.registerCommand(name, {
       description: PONYTAIL_COMMAND_DESCRIPTION,
       getArgumentCompletions: (prefix) => completePonytailArgs(prefix),
@@ -164,29 +164,29 @@ export default function ponytailExtension(pi) {
     });
   }
 
-  pi.registerCommand("ponytail-review", {
-    description: "Run /skill:ponytail-review",
-    handler: (args, ctx) => sendAlias("/skill:ponytail-review", args, ctx),
+  pi.registerCommand("codecraft-review", {
+    description: "Run /skill:codecraft-review",
+    handler: (args, ctx) => sendAlias("/skill:codecraft-review", args, ctx),
   });
 
-  pi.registerCommand("ponytail-audit", {
-    description: "Run /skill:ponytail-audit",
-    handler: (args, ctx) => sendAlias("/skill:ponytail-audit", args, ctx),
+  pi.registerCommand("codecraft-audit", {
+    description: "Run /skill:codecraft-audit",
+    handler: (args, ctx) => sendAlias("/skill:codecraft-audit", args, ctx),
   });
 
-  pi.registerCommand("ponytail-gain", {
-    description: "Run /skill:ponytail-gain",
-    handler: (args, ctx) => sendAlias("/skill:ponytail-gain", args, ctx),
+  pi.registerCommand("codecraft-gain", {
+    description: "Run /skill:codecraft-gain",
+    handler: (args, ctx) => sendAlias("/skill:codecraft-gain", args, ctx),
   });
 
-  pi.registerCommand("ponytail-debt", {
-    description: "Run /skill:ponytail-debt",
-    handler: (args, ctx) => sendAlias("/skill:ponytail-debt", args, ctx),
+  pi.registerCommand("codecraft-debt", {
+    description: "Run /skill:codecraft-debt",
+    handler: (args, ctx) => sendAlias("/skill:codecraft-debt", args, ctx),
   });
 
-  pi.registerCommand("ponytail-help", {
-    description: "Run /skill:ponytail-help",
-    handler: (args, ctx) => sendAlias("/skill:ponytail-help", args, ctx),
+  pi.registerCommand("codecraft-help", {
+    description: "Run /skill:codecraft-help",
+    handler: (args, ctx) => sendAlias("/skill:codecraft-help", args, ctx),
   });
 
   for (const name of ["review", "audit", "debt", "gain", "help"]) {
@@ -242,7 +242,7 @@ export default function ponytailExtension(pi) {
   pi.on("before_agent_start", async (event) => {
     if (!currentMode || currentMode === "off") {
       // Clear a stale section when the mode is off so a previous turn does not linger (#953).
-      if (event?.systemPromptOptions?.sections) delete event.systemPromptOptions.sections.ponytail;
+      if (event?.systemPromptOptions?.sections) delete event.systemPromptOptions.sections.codecraft;
       return;
     }
     const instructions = getPonytailInstructions(currentMode);
@@ -251,7 +251,7 @@ export default function ponytailExtension(pi) {
     // for older Pi versions without systemPromptOptions.sections.
     const sections = event?.systemPromptOptions?.sections;
     if (sections && typeof sections === "object") {
-      sections.ponytail = instructions;
+      sections.codecraft = instructions;
       return;
     }
     // OMP passes the system prompt as an array of parts; keep it one (#776).

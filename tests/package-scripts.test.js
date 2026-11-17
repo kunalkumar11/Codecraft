@@ -29,7 +29,7 @@ test('publishing gates OIDC access on tests and pins executable dependencies', (
   assert.match(ci, /^  workflow_call:$/m);
   assert.doesNotMatch(ci, /^    tags:/m, 'tag tests are run by the publishing workflow');
   assert.match(publish, /^  test:\n    uses: \.\/\.github\/workflows\/test\.yml$/m);
-  assert.match(publish, /^  publish:\n    if: \$\{\{ github\.repository == 'DietrichGebert\/ponytail' \}\}$/m,
+  assert.match(publish, /^  publish:\n    if: \$\{\{ github\.repository == 'kunalkumar11\/codecraft' \}\}$/m,
     'the inherited publisher must not publish a derivative from a fork');
   assert.match(publish, /^    needs: test$/m);
   assert.match(publish, /^permissions:\n  contents: read\n\n/m);

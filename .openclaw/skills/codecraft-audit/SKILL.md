@@ -1,7 +1,7 @@
 ---
 name: codecraft-audit
 description: "CodeCraft quality audit of the whole repo: bugs, security, real load, missing tests, speed, and what to delete."
-homepage: https://github.com/DietrichGebert/ponytail
+homepage: https://github.com/kunalkumar11/Codecraft
 license: MIT
 ---
 

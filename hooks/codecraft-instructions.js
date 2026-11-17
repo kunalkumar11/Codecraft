@@ -3,10 +3,10 @@
 
 const fs = require('fs');
 const path = require('path');
-const { DEFAULT_MODE, normalizeMode, normalizePersistedMode } = require('./ponytail-config');
+const { DEFAULT_MODE, normalizeMode, normalizePersistedMode } = require('./codecraft-config');
 
 const INDEPENDENT_MODES = new Set(['review']);
-const SKILL_PATH = path.join(__dirname, '..', 'skills', 'ponytail', 'SKILL.md');
+const SKILL_PATH = path.join(__dirname, '..', 'skills', 'codecraft', 'SKILL.md');
 
 function filterSkillBodyForMode(body, mode) {
   const effectiveMode = normalizeMode(mode) || DEFAULT_MODE;
@@ -43,7 +43,7 @@ function filterSkillBodyForMode(body, mode) {
 function getFallbackInstructions(mode) {
   // Used only when SKILL.md cannot be read: the same rules as AGENTS.md.
   return 'CODECRAFT MODE ACTIVE — level: ' + mode + '\n\n' +
-    'Switch level: `/ponytail lite|full|ultra`. Off: "stop ponytail" or "normal mode".\n\n' +
+    'Switch level: `/codecraft lite|full|ultra`. Off: "stop codecraft" or "normal mode".\n\n' +
     "You are a lazy senior developer. The best code is the code never written. You solve the whole problem with the least new code. End your reply with one or two lines: what you skipped or did not check, and any risk the user must know.\n" +
     "\n" +
     "## Before you write\n" +
@@ -78,7 +78,7 @@ function getPonytailInstructions(mode) {
   const configuredMode = normalizePersistedMode(mode) || DEFAULT_MODE;
 
   if (INDEPENDENT_MODES.has(configuredMode)) {
-    return 'CODECRAFT MODE ACTIVE — level: ' + configuredMode + '. Behavior defined by /ponytail-' + configuredMode + ' skill.';
+    return 'CODECRAFT MODE ACTIVE — level: ' + configuredMode + '. Behavior defined by /codecraft-' + configuredMode + ' skill.';
   }
 
   const effectiveMode = normalizeMode(configuredMode) || DEFAULT_MODE;

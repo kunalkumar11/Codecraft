@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// ponytail — removes state ponytail wrote outside the plugin's own files:
+// codecraft — removes state codecraft wrote outside the plugin's own files:
 // the mode flag, the config file, the statusline script copy, the
 // statusLine entry it added to settings.json, and its entries in
 // ~/.cursor/hooks.json. Plugin files themselves are removed by each host's
@@ -9,10 +9,10 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { getConfigPath, getClaudeDir, getQoderDir } = require('../hooks/ponytail-config');
+const { getConfigPath, getClaudeDir, getQoderDir } = require('../hooks/codecraft-config');
 const cursorHooks = require('./cursor-hooks');
 
-const STATUSLINE_SCRIPT = /(?:^|[\s"'\\/])ponytail-statusline\.(?:sh|ps1)(?=$|[\s"'])/;
+const STATUSLINE_SCRIPT = /(?:^|[\s"'\\/])codecraft-statusline\.(?:sh|ps1)(?=$|[\s"'])/;
 
 function removeIfExists(filePath, label) {
   try {
@@ -23,32 +23,32 @@ function removeIfExists(filePath, label) {
   }
 }
 
-removeIfExists(path.join(getClaudeDir(), '.ponytail-active'), 'mode flag');
-removeIfExists(path.join(getClaudeDir(), '.ponytail-statusline-nudged'), 'statusline nudge flag');
-removeIfExists(path.join(os.homedir(), '.cursor', '.ponytail-active'), 'Cursor mode flag');
-removeIfExists(path.join(getQoderDir(), '.ponytail-active'), 'Qoder mode flag');
-for (const dir of [path.join(getClaudeDir(), 'ponytail-modes'), path.join(os.homedir(), '.cursor', 'ponytail-modes'), path.join(process.env.CODEBUDDY_CONFIG_DIR || path.join(os.homedir(), '.codebuddy'), 'ponytail-modes')]) {
+removeIfExists(path.join(getClaudeDir(), '.codecraft-active'), 'mode flag');
+removeIfExists(path.join(getClaudeDir(), '.codecraft-statusline-nudged'), 'statusline nudge flag');
+removeIfExists(path.join(os.homedir(), '.cursor', '.codecraft-active'), 'Cursor mode flag');
+removeIfExists(path.join(getQoderDir(), '.codecraft-active'), 'Qoder mode flag');
+for (const dir of [path.join(getClaudeDir(), 'codecraft-modes'), path.join(os.homedir(), '.cursor', 'codecraft-modes'), path.join(process.env.CODEBUDDY_CONFIG_DIR || path.join(os.homedir(), '.codebuddy'), 'codecraft-modes')]) {
   if (fs.existsSync(dir)) {
     fs.rmSync(dir, { recursive: true });
     console.log(`Removed per-project mode flags: ${dir}`);
   }
 }
-removeIfExists(path.join(process.env.CODEBUDDY_CONFIG_DIR || path.join(os.homedir(), '.codebuddy'), '.ponytail-active'), 'CodeBuddy mode flag');
-removeIfExists(path.join(process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config'), 'opencode', '.ponytail-active'), 'OpenCode mode flag');
+removeIfExists(path.join(process.env.CODEBUDDY_CONFIG_DIR || path.join(os.homedir(), '.codebuddy'), '.codecraft-active'), 'CodeBuddy mode flag');
+removeIfExists(path.join(process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config'), 'opencode', '.codecraft-active'), 'OpenCode mode flag');
 removeIfExists(getConfigPath(), 'config file');
 // Statusline script copies the activate hook keeps in the config dir (#1032).
-for (const name of ['ponytail-statusline.sh', 'ponytail-statusline.ps1']) {
+for (const name of ['codecraft-statusline.sh', 'codecraft-statusline.ps1']) {
   removeIfExists(path.join(getClaudeDir(), name), 'statusline script');
 }
 
-// Cursor hooks (#817): drop only ponytail's entries from ~/.cursor/hooks.json,
+// Cursor hooks (#817): drop only codecraft's entries from ~/.cursor/hooks.json,
 // keep every other hook the user configured there.
 try {
   const hooksFile = cursorHooks.uninstall('user');
   if (hooksFile) console.log(`Removed CodeCraft hooks from ${hooksFile}`);
 } catch (e) {
   if (e instanceof SyntaxError) {
-    // ponytail: malformed hooks.json — can't safely edit it; leave intact, warn
+    // codecraft: malformed hooks.json — can't safely edit it; leave intact, warn
       console.warn(`~/.cursor/hooks.json is malformed — could not remove the CodeCraft hook entries. Remove them manually from: ${cursorHooks.hooksPath('user')} (${e.message})`);
   } else {
     throw e;
@@ -60,9 +60,9 @@ try {
   const raw = fs.readFileSync(settingsPath, 'utf8').replace(/^\uFEFF/, '');
   const settings = JSON.parse(raw);
   const cmd = settings.statusLine && settings.statusLine.command;
-  // Only remove the parts ponytail owns. If the user combined statuslines
-  // (e.g. caveman && ponytail), keep the other plugin's command intact.
-  // ponytail: splits on && / ; to detect other segments — good enough; a user
+  // Only remove the parts codecraft owns. If the user combined statuslines
+  // (e.g. caveman && codecraft), keep the other plugin's command intact.
+  // codecraft: splits on && / ; to detect other segments — good enough; a user
   // piping statuslines together is on their own.
   if (typeof cmd === 'string' && STATUSLINE_SCRIPT.test(cmd)) {
     const parts = cmd
@@ -84,8 +84,8 @@ try {
   if (e.code === 'ENOENT') {
     // no settings.json — nothing to clean
   } else if (e instanceof SyntaxError) {
-    // ponytail: malformed settings.json — can't safely edit it; leave intact, warn
-    console.warn(`settings.json is malformed — could not remove the ponytail statusLine entry. Remove it manually from: ${settingsPath} (${e.message})`);
+    // codecraft: malformed settings.json — can't safely edit it; leave intact, warn
+    console.warn(`settings.json is malformed — could not remove the codecraft statusLine entry. Remove it manually from: ${settingsPath} (${e.message})`);
   } else {
     throw e;
   }

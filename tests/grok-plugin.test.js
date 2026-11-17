@@ -19,7 +19,7 @@ test('Grok manifest is a skill-only adapter with no lifecycle hooks', () => {
 });
 
 test('Ponytail skill describes every coding task for Grok auto-invocation', () => {
-  const skill = fs.readFileSync(path.join(root, 'skills', 'ponytail', 'SKILL.md'), 'utf8');
+  const skill = fs.readFileSync(path.join(root, 'skills', 'codecraft', 'SKILL.md'), 'utf8');
   assert.match(skill, /Use on any\s+coding task/i);
   assert.match(skill, /writing,\s+fixing, refactoring, reviewing/i);
   assert.doesNotMatch(skill, /disable-model-invocation:\s*true/i);
@@ -35,7 +35,7 @@ test('Grok marketplace resolves a subdirectory with the same skills as direct in
   // so verify the skills directory exists and has the expected skills.
   assert.ok(fs.existsSync(pluginRoot), 'marketplace source directory must exist');
   assert.equal(path.resolve(pluginRoot), path.join(root, 'skills'), 'source must point to skills/');
-  for (const name of ['codecraft', 'codecraft-review', 'codecraft-audit', 'codecraft-debt', 'codecraft-gain', 'codecraft-help', 'ponytail', 'ponytail-review', 'ponytail-audit', 'ponytail-debt', 'ponytail-gain', 'ponytail-help']) {
+  for (const name of ['codecraft', 'codecraft-review', 'codecraft-audit', 'codecraft-debt', 'codecraft-gain', 'codecraft-help', 'codecraft', 'codecraft-review', 'codecraft-audit', 'codecraft-debt', 'codecraft-gain', 'codecraft-help']) {
     assert.ok(fs.existsSync(path.join(pluginRoot, name, 'SKILL.md')), `${name} must ship in skills/`);
   }
 });

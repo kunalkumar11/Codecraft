@@ -1,17 +1,17 @@
 #!/usr/bin/env node
-// ponytail — Claude Code SessionStart activation hook (also Codex, Copilot,
+// codecraft — Claude Code SessionStart activation hook (also Codex, Copilot,
 // Grok, CodeBuddy and Cursor sessionStart)
 //
 // Runs on every session start:
-//   1. Writes flag file at $CLAUDE_CONFIG_DIR/.ponytail-active (defaults to ~/.claude; statusline reads this)
-//   2. Emits ponytail ruleset as hidden SessionStart context
+//   1. Writes flag file at $CLAUDE_CONFIG_DIR/.codecraft-active (defaults to ~/.claude; statusline reads this)
+//   2. Emits codecraft ruleset as hidden SessionStart context
 //   3. Detects missing statusline config and emits setup nudge
 
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { getDefaultMode, getClaudeDir, isShellSafe } = require('./ponytail-config');
-const { getPonytailInstructions } = require('./ponytail-instructions');
+const { getDefaultMode, getClaudeDir, isShellSafe } = require('./codecraft-config');
+const { getPonytailInstructions } = require('./codecraft-instructions');
 const {
   clearMode,
   cursorRuleNotice,
@@ -23,7 +23,7 @@ const {
   readMode,
   setMode,
   writeHookOutput,
-} = require('./ponytail-runtime');
+} = require('./codecraft-runtime');
 
 const claudeDir = getClaudeDir();
 const settingsPath = path.join(claudeDir, 'settings.json');
@@ -57,14 +57,14 @@ function activate(mode) {
     // Silent fail -- flag is best-effort, don't block the hook
   }
 
-  // 2. Emit the ponytail ruleset, filtered to the active intensity level.
+  // 2. Emit the codecraft ruleset, filtered to the active intensity level.
   let output = getPonytailInstructions(mode);
 
   // 2b. Codebase map: what already exists, so "reuse first" costs no search. Fail open: the map
   // gets 3 s, well inside the 15 s hook limit, so a stalled map never costs the rules (#1079, #1157).
   // shortcut: a map slower than 3 s is still dropped; a cached per-repo map would lift that if it shows up.
   if (mode !== 'review' && (process.env.CODECRAFT_MAP ?? process.env.PONYTAIL_MAP) !== '0') try {
-    const map = execFileSync(process.execPath, [path.join(__dirname, 'ponytail-map.js')], {
+    const map = execFileSync(process.execPath, [path.join(__dirname, 'codecraft-map.js')], {
       encoding: 'utf8', timeout: 3000, maxBuffer: 64 * 1024, stdio: ['ignore', 'pipe', 'ignore'],
     }).trimEnd();
     if (map) output += '\n\n' + map;
@@ -87,7 +87,7 @@ function activate(mode) {
     // plugin version that has since been deleted. Only absolute paths are checked,
     // so ~ or $HOME forms are never mistaken for missing files.
     const ref = statusCommand &&
-      statusCommand.match(/"([^"]*ponytail-statusline\.(?:sh|ps1))"|(\S*ponytail-statusline\.(?:sh|ps1))/);
+      statusCommand.match(/"([^"]*codecraft-statusline\.(?:sh|ps1))"|(\S*codecraft-statusline\.(?:sh|ps1))/);
     const refPath = ref ? (ref[1] || ref[2]) : null;
     // isShellSafe keeps quotes, newlines and shell metacharacters from
     // settings.json out of the model context.
@@ -98,19 +98,19 @@ function activate(mode) {
       (!isWindows || /^([A-Za-z]:[\\/]|\\\\)/.test(refPath));
     const stalePath = checkable && !fs.existsSync(refPath) ? refPath : null;
 
-    // The plugin root is a versioned cache dir (.../ponytail/4.12.0/) that Claude
+    // The plugin root is a versioned cache dir (.../codecraft/4.12.0/) that Claude
     // Code deletes on update, so a statusLine pointing into it goes blank after the
     // next update (#1032). Point it at a copy in the config dir instead. A statusLine
-    // that already runs ponytail keeps its script type, so its copy stays fresh.
+    // that already runs codecraft keeps its script type, so its copy stays fresh.
     const usePs1 = refPath ? refPath.endsWith('.ps1') : isWindows;
-    const scriptName = usePs1 ? 'ponytail-statusline.ps1' : 'ponytail-statusline.sh';
+    const scriptName = usePs1 ? 'codecraft-statusline.ps1' : 'codecraft-statusline.sh';
     const scriptPath = path.join(claudeDir, scriptName);
 
     // Nudge at most once — the flag file marks that the user has already seen
     // (and implicitly declined) the statusline setup offer. Repeating it every
     // session start turns a helpful hint into a nag. A broken path is nudged once
     // per path: the flag records it.
-    const nudgeFlagPath = path.join(claudeDir, '.ponytail-statusline-nudged');
+    const nudgeFlagPath = path.join(claudeDir, '.codecraft-statusline-nudged');
     let nudged = null;
     try { nudged = fs.readFileSync(nudgeFlagPath, 'utf8'); } catch (e) { /* not nudged yet */ }
     const nudge = stalePath ? nudged !== stalePath : statusCommand === null && nudged === null;
@@ -135,8 +135,8 @@ function activate(mode) {
       if (stalePath) {
         output += "\n\n" +
           "STATUSLINE BROKEN: The statusLine in " + settingsPath + " runs " + stalePath +
-          ", which no longer exists (the ponytail plugin was updated and its old version removed), " +
-          "so the ponytail badge is blank. Replace that path with " + scriptPath + ", which survives updates, " +
+          ", which no longer exists (the codecraft plugin was updated and its old version removed), " +
+          "so the codecraft badge is blank. Replace that path with " + scriptPath + ", which survives updates, " +
           "quoting it for your shell. Keep the rest of the command. " +
           "Proactively offer to fix this for the user on first interaction.";
       } else if (isShellSafe(scriptPath)) {
@@ -146,16 +146,16 @@ function activate(mode) {
         const statusLineSnippet =
           '"statusLine": { "type": "command", "command": ' + JSON.stringify(command) + ' }';
         output += "\n\n" +
-          "STATUSLINE SETUP NEEDED: The ponytail plugin includes a statusline badge showing active mode " +
+          "STATUSLINE SETUP NEEDED: The codecraft plugin includes a statusline badge showing active mode " +
           "(e.g. [CODECRAFT], [CODECRAFT:ULTRA]). It is not configured yet. " +
           "To enable, add this to " + settingsPath + ": " +
           statusLineSnippet + " " +
           "Proactively offer to set this up for the user on first interaction.";
       } else {
-        // ponytail: config dir path has shell metacharacters; don't embed it in a
+        // codecraft: config dir path has shell metacharacters; don't embed it in a
         // command snippet; have the agent wire it up by hand instead.
         output += "\n\n" +
-          "STATUSLINE SETUP NEEDED: The ponytail plugin includes a statusline badge showing active mode. " +
+          "STATUSLINE SETUP NEEDED: The codecraft plugin includes a statusline badge showing active mode. " +
           "Its path contains characters unsafe to embed in a shell command, so configure it manually: " +
           "add a statusLine command of type \"command\" that runs " + scriptName +
           " from " + claudeDir + " to " + settingsPath + ", quoting/escaping the path for your shell. " +
@@ -174,7 +174,7 @@ function activate(mode) {
 }
 
 // Compaction re-runs SessionStart inside the same conversation, so it keeps the
-// live level (or stays off after "stop ponytail") instead of resetting to the
+// live level (or stays off after "stop codecraft") instead of resetting to the
 // default. Claude Code and Codex pass the trigger as `source` on stdin; reading
 // it there keeps the hook entry, and the trust Codex gave it, unchanged.
 let input = '';

@@ -39,10 +39,10 @@ def _normalize_runtime_mode(mode: str | None) -> str | None:
 
 def _config_dir() -> Path:
     if os.environ.get("XDG_CONFIG_HOME"):
-        return Path(os.environ["XDG_CONFIG_HOME"]) / "ponytail"
+        return Path(os.environ["XDG_CONFIG_HOME"]) / "codecraft"
     if os.name == "nt":
-        return Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming")) / "ponytail"
-    return Path.home() / ".config" / "ponytail"
+        return Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming")) / "codecraft"
+    return Path.home() / ".config" / "codecraft"
 
 
 def _default_mode() -> str:
@@ -141,7 +141,7 @@ def _skill_prompt(command: str, args: str = "") -> str:
     tail = args.strip()
     target = f"\n\nUser arguments: {tail}" if tail else ""
     return (
-        f"Load and follow the Hermes plugin skill `ponytail:{command}`. "
+        f"Load and follow the Hermes plugin skill `codecraft:{command}`. "
         f"{SKILL_COMMANDS[command]}{target}"
     )
 

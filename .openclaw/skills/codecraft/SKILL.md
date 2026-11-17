@@ -1,7 +1,7 @@
 ---
 name: codecraft
 description: "CodeCraft guidance for coding tasks: the smallest change that fully solves it, and a reply a busy human understands in one read."
-homepage: https://github.com/DietrichGebert/ponytail
+homepage: https://github.com/kunalkumar11/Codecraft
 license: MIT
 ---
 

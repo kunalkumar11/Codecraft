@@ -1,14 +1,14 @@
 'use strict';
 
-// ponytail command-file and SKILL.md frontmatter parser.
+// codecraft command-file and SKILL.md frontmatter parser.
 //
-// Pulled out of ponytail.mjs so the plugin module's only top-level export is
+// Pulled out of codecraft.mjs so the plugin module's only top-level export is
 // the plugin definition itself. OpenCode's legacy plugin loader (the one that
 // runs before v1 plugins are detected) treats every function exported from a
 // plugin module as a plugin; calling the frontmatter parser as one threw
 // "path must be a string or a file descriptor" because it got the plugin
 // context object as its first argument. Keeping the parser in its own module
-// leaves exactly one plugin-shaped export on ponytail.mjs.
+// leaves exactly one plugin-shaped export on codecraft.mjs.
 
 function parseCommandFile(filePath) {
   const fs = require('fs');
@@ -20,7 +20,7 @@ function parseCommandFile(filePath) {
   return { description, template: match[2].trim() };
 }
 
-// ponytail: flat frontmatter only — the shape every shipped SKILL.md uses. A
+// codecraft: flat frontmatter only — the shape every shipped SKILL.md uses. A
 // nested key or an anchor is not interpreted, and a real YAML parser is the
 // upgrade path if a skill ever needs one.
 function frontmatterField(frontmatter, key) {
@@ -31,7 +31,7 @@ function frontmatterField(frontmatter, key) {
   if (value[0] !== '>' && value[0] !== '|') return value;
 
   // Block scalar: `>` folds the lines into one, `|` keeps them. Indented lines
-  // continue the block, the next unindented key ends it (skills/ponytail has
+  // continue the block, the next unindented key ends it (skills/codecraft has
   // `argument-hint` after its description), and a trailing `-` drops the
   // newline YAML would otherwise close the scalar with.
   const block = [];

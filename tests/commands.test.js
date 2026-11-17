@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Every CodeCraft and compatibility command the pi extension registers must ship as a
 // file-based command for the hosts that need one: Claude Code (commands/*.toml,
-// which Gemini CLI reuses) and OpenCode (.opencode/command/*.md). /ponytail-help
+// which Gemini CLI reuses) and OpenCode (.opencode/command/*.md). /codecraft-help
 // was advertised in the README and the help card but missing both files; this
 // guards that drift -- a registered command with no adapter file fails here.
 
@@ -17,13 +17,13 @@ const root = path.join(__dirname, '..');
 const piSource = fs.readFileSync(path.join(root, 'pi-extension', 'index.js'), 'utf8');
 const commands = [...new Set([
   ...[...piSource.matchAll(/registerCommand\(["']([\w-]+)["']/g)].map((m) => m[1]),
-  ...(piSource.includes('["codecraft", "ponytail"]') ? ['codecraft', 'ponytail'] : []),
+  ...(piSource.includes('["codecraft", "codecraft"]') ? ['codecraft', 'codecraft'] : []),
   ...['review', 'audit', 'debt', 'gain', 'help'].map((name) => `codecraft-${name}`),
 ])];
 
 test('pi registers at least the base command', () => {
   assert.ok(commands.includes('codecraft'), 'expected pi to register /codecraft');
-  assert.ok(commands.includes('ponytail'), 'expected pi to register a ponytail command');
+  assert.ok(commands.includes('codecraft'), 'expected pi to register a codecraft command');
 });
 
 test('every registered command ships a Claude commands/*.toml', () => {
@@ -46,9 +46,9 @@ test('every registered command ships an OpenCode .opencode/command/*.md', () => 
 
 test('CodeCraft command and skill aliases stay in sync with their legacy source', () => {
   const toCodeCraft = (text) => text.replaceAll('PONYTAIL', 'CODECRAFT')
-    .replaceAll('Ponytail', 'CodeCraft').replaceAll('ponytail', 'codecraft');
-  for (const prefix of ['ponytail', 'ponytail-review', 'ponytail-audit', 'ponytail-debt', 'ponytail-gain', 'ponytail-help']) {
-    const alias = prefix.replace('ponytail', 'codecraft');
+    .replaceAll('Ponytail', 'CodeCraft').replaceAll('codecraft', 'codecraft');
+  for (const prefix of ['codecraft', 'codecraft-review', 'codecraft-audit', 'codecraft-debt', 'codecraft-gain', 'codecraft-help']) {
+    const alias = prefix.replace('codecraft', 'codecraft');
     assert.equal(
       fs.readFileSync(path.join(root, 'skills', alias, 'SKILL.md'), 'utf8'),
       toCodeCraft(fs.readFileSync(path.join(root, 'skills', prefix, 'SKILL.md'), 'utf8')),
@@ -67,28 +67,28 @@ test('CodeCraft command and skill aliases stay in sync with their legacy source'
   }
 });
 
-// /ponytail-debt documents one grep for the whole tree, shipped in four copies.
-// It missed C-style /* ponytail: */ block comments (#810), so the ledger silently
+// /codecraft-debt documents one grep for the whole tree, shipped in four copies.
+// It missed C-style /* codecraft: */ block comments (#810), so the ledger silently
 // skipped every C/Java/CSS marker. Feed each shipped expression to real grep
 // rather than restating it here: a copied regex only tests the copy.
 const debtCopies = [
-  'skills/ponytail-debt/SKILL.md',
-  '.openclaw/skills/ponytail-debt/SKILL.md',
-  'commands/ponytail-debt.toml',
-  '.opencode/command/ponytail-debt.md',
+  'skills/codecraft-debt/SKILL.md',
+  '.openclaw/skills/codecraft-debt/SKILL.md',
+  'commands/codecraft-debt.toml',
+  '.opencode/command/codecraft-debt.md',
 ];
 const debtSamples = [
-  ['# ponytail: hash marker', true],
-  ['#ponytail: hash marker, no space', true],
-  ['// ponytail: slash marker', true],
-  ['//ponytail: slash marker, no space', true],
-  ['/* ponytail: block marker, closed here */', true],
-  ['/*ponytail: block marker, no space */', true],
-  ['/* ponytail: block opener, closed some lines below', true],
-  ['prose that merely mentions ponytail: markers stays out of the ledger', false],
+  ['# codecraft: hash marker', true],
+  ['#codecraft: hash marker, no space', true],
+  ['// codecraft: slash marker', true],
+  ['//codecraft: slash marker, no space', true],
+  ['/* codecraft: block marker, closed here */', true],
+  ['/*codecraft: block marker, no space */', true],
+  ['/* codecraft: block opener, closed some lines below', true],
+  ['prose that merely mentions codecraft: markers stays out of the ledger', false],
 ];
 
-test('every ponytail-debt copy pattern matches comment markers but not prose', () => {
+test('every codecraft-debt copy pattern matches comment markers but not prose', () => {
   const input = debtSamples.map(([line]) => line).join('\n') + '\n';
   const expected = debtSamples.flatMap(([line, hit], i) => (hit ? [`${i + 1}:${line}`] : []));
 
@@ -102,17 +102,17 @@ test('every ponytail-debt copy pattern matches comment markers but not prose', (
 });
 
 // The full documented command must skip .git and whatever .gitignore ignores, in any stack (#948, #1100).
-test('the ponytail-debt scan skips .git and ignored dirs like node_modules, dist, build and .next', (t) => {
-  const command = fs.readFileSync(path.join(root, 'skills/ponytail-debt/SKILL.md'), 'utf8').match(/`(git grep [^`]+)`/);
+test('the codecraft-debt scan skips .git and ignored dirs like node_modules, dist, build and .next', (t) => {
+  const command = fs.readFileSync(path.join(root, 'skills/codecraft-debt/SKILL.md'), 'utf8').match(/`(git grep [^`]+)`/);
   assert.ok(command, 'skill must document a git grep command');
   const documented = command[1].match(/^git grep (--no-index) (--exclude-standard) (-nE) '([^']+)'$/);
   assert.ok(documented, `unrecognized portable grep command: ${command[1]}`);
-  const dir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'ponytail-debt-'));
+  const dir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'codecraft-debt-'));
   let result;
   try {
     for (const sub of ['src', '.git', 'node_modules/pkg', 'dist', 'build', '.next']) {
       fs.mkdirSync(path.join(dir, sub), { recursive: true });
-      fs.writeFileSync(path.join(dir, sub, 'a.js'), '// ponytail: marker\n');
+      fs.writeFileSync(path.join(dir, sub, 'a.js'), '// codecraft: marker\n');
     }
     fs.writeFileSync(path.join(dir, '.gitignore'), 'node_modules/\ndist/\nbuild/\n.next/\n');
     result = spawnSync('git', ['grep', documented[1], documented[2], documented[3], documented[4]], {
@@ -124,5 +124,5 @@ test('the ponytail-debt scan skips .git and ignored dirs like node_modules, dist
   if (result.error?.code === 'ENOENT') return t.skip('Git is required to run the documented git grep command');
   assert.equal(result.error, undefined, result.error?.message);
   assert.equal(result.status, 0, `git grep failed: ${result.stderr}`);
-  assert.deepEqual(result.stdout.split('\n').filter(Boolean), ['src/a.js:1:// ponytail: marker']);
+  assert.deepEqual(result.stdout.split('\n').filter(Boolean), ['src/a.js:1:// codecraft: marker']);
 });

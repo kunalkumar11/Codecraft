@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
-import ponytailExtension, { parsePonytailCommand } from "../index.js";
+import codecraftExtension, { parsePonytailCommand } from "../index.js";
 
 function createPiHarness() {
   const events = new Map();
@@ -27,7 +27,7 @@ function createPiHarness() {
     },
   };
 
-  ponytailExtension(pi);
+  codecraftExtension(pi);
   return { events, commands, appendedEntries, sentUserMessages };
 }
 
@@ -41,7 +41,7 @@ function createCommandContext(overrides = {}) {
 }
 
 function withTempConfig(fn) {
-  const tempConfigHome = mkdtempSync(join(tmpdir(), "ponytail-test-"));
+  const tempConfigHome = mkdtempSync(join(tmpdir(), "codecraft-test-"));
   const previousXdg = process.env.XDG_CONFIG_HOME;
   const previousHide = process.env.PONYTAIL_HIDE_STATUS;
   const previousDefault = process.env.PONYTAIL_DEFAULT_MODE;
@@ -70,21 +70,21 @@ function withTempConfig(fn) {
     });
 }
 
-test("extension registers CodeCraft commands and legacy aliases", () => {
+test("extension registers CodeCraft commands", () => {
   const { commands } = createPiHarness();
 
-  assert.deepEqual([...commands.keys()].sort(), ["codecraft", "codecraft-audit", "codecraft-debt", "codecraft-gain", "codecraft-help", "codecraft-review", "ponytail", "ponytail-audit", "ponytail-debt", "ponytail-gain", "ponytail-help", "ponytail-review"]);
+  assert.deepEqual([...commands.keys()].sort(), ["codecraft", "codecraft-audit", "codecraft-debt", "codecraft-gain", "codecraft-help", "codecraft-review"]);
 });
 
-test("/ponytail updates session mode and injects instructions", async () => withTempConfig(async () => {
+test("/codecraft updates session mode and injects instructions", async () => withTempConfig(async () => {
   const { commands, events, appendedEntries } = createPiHarness();
   const ctx = createCommandContext();
 
   await events.get("session_start")({ reason: "startup" }, ctx);
-  await commands.get("ponytail").handler("ultra", ctx);
+  await commands.get("codecraft").handler("ultra", ctx);
 
   assert.deepEqual(appendedEntries.at(-1), {
-    customType: "ponytail-mode",
+    customType: "codecraft-mode",
     data: { mode: "ultra" },
   });
 
@@ -97,7 +97,7 @@ test("/codecraft and its task commands work alongside the legacy aliases", async
   const { commands, appendedEntries, sentUserMessages, events } = createPiHarness();
   const ctx = createCommandContext();
   await commands.get("codecraft").handler("ultra", ctx);
-  assert.equal(appendedEntries.at(-1).customType, "ponytail-mode");
+  assert.equal(appendedEntries.at(-1).customType, "codecraft-mode");
   assert.equal(appendedEntries.at(-1).data.mode, "ultra");
   await commands.get("codecraft-review").handler("src", ctx);
   assert.deepEqual(sentUserMessages.at(-1), {
@@ -144,10 +144,10 @@ test("before_agent_start keeps OMP prompt parts and uses Pi sections (#776, #953
   // Pi >= 0.86: write a section and leave the prompt alone; off removes it again.
   const event = { systemPrompt: "BASE", systemPromptOptions: { sections: {} } };
   assert.equal(await events.get("before_agent_start")(event, ctx), undefined);
-  assert.match(event.systemPromptOptions.sections.ponytail, /CODECRAFT MODE ACTIVE/);
-  await commands.get("ponytail").handler("off", ctx);
+  assert.match(event.systemPromptOptions.sections.codecraft, /CODECRAFT MODE ACTIVE/);
+  await commands.get("codecraft").handler("off", ctx);
   await events.get("before_agent_start")(event, ctx);
-  assert.equal(event.systemPromptOptions.sections.ponytail, undefined);
+  assert.equal(event.systemPromptOptions.sections.codecraft, undefined);
 }));
 
 test("session_start restores latest persisted mode", async () => withTempConfig(async () => {
@@ -155,7 +155,7 @@ test("session_start restores latest persisted mode", async () => withTempConfig(
   const ctx = createCommandContext({
     sessionManager: {
       getEntries: () => [
-        { type: "custom", customType: "ponytail-mode", data: { mode: "lite" } },
+        { type: "custom", customType: "codecraft-mode", data: { mode: "lite" } },
       ],
     },
   });
@@ -168,8 +168,8 @@ test("session_start restores latest persisted mode", async () => withTempConfig(
 
 test("session_tree restores the selected branch's mode without persisting it", async () => withTempConfig(async () => {
   const { events, commands, appendedEntries } = createPiHarness();
-  const lite = { type: "custom", customType: "ponytail-mode", data: { mode: "lite" } };
-  const off = { type: "custom", customType: "ponytail-mode", data: { mode: "off" } };
+  const lite = { type: "custom", customType: "codecraft-mode", data: { mode: "lite" } };
+  const off = { type: "custom", customType: "codecraft-mode", data: { mode: "off" } };
   let branch = [lite, off];
   const statusWrites = [];
   const notifications = [];
@@ -183,7 +183,7 @@ test("session_tree restores the selected branch's mode without persisting it", a
   });
 
   await events.get("session_start")({ reason: "resume" }, ctx);
-  await commands.get("ponytail").handler("default ultra", ctx);
+  await commands.get("codecraft").handler("default ultra", ctx);
   assert.equal(await events.get("before_agent_start")({ systemPrompt: "BASE" }, ctx), undefined);
   const notificationCount = notifications.length;
 
@@ -207,8 +207,8 @@ test("session_tree restores the selected branch's mode without persisting it", a
 test("OMP session_switch and session_branch restore the target session's mode", async () => withTempConfig(async () => {
   // OMP keeps the legacy Pi events instead of re-emitting session_start on /new, /resume, /fork and /branch.
   const { events, appendedEntries } = createPiHarness();
-  const lite = { type: "custom", customType: "ponytail-mode", data: { mode: "lite" } };
-  const off = { type: "custom", customType: "ponytail-mode", data: { mode: "off" } };
+  const lite = { type: "custom", customType: "codecraft-mode", data: { mode: "lite" } };
+  const off = { type: "custom", customType: "codecraft-mode", data: { mode: "off" } };
   let branch = [off];
   const ctx = createCommandContext({ sessionManager: { getBranch: () => branch } });
 
@@ -227,30 +227,30 @@ test("skill alias commands delegate to Pi skill commands", async () => {
   const { commands, sentUserMessages } = createPiHarness();
   const ctx = createCommandContext();
 
-  await commands.get("ponytail-review").handler("", ctx);
-  await commands.get("ponytail-audit").handler("", ctx);
-  await commands.get("ponytail-debt").handler("", ctx);
-  await commands.get("ponytail-gain").handler("", ctx);
-  await commands.get("ponytail-help").handler("", ctx);
+  await commands.get("codecraft-review").handler("", ctx);
+  await commands.get("codecraft-audit").handler("", ctx);
+  await commands.get("codecraft-debt").handler("", ctx);
+  await commands.get("codecraft-gain").handler("", ctx);
+  await commands.get("codecraft-help").handler("", ctx);
 
   assert.deepEqual(sentUserMessages.map((entry) => entry.text), [
-    "/skill:ponytail-review",
-    "/skill:ponytail-audit",
-    "/skill:ponytail-debt",
-    "/skill:ponytail-gain",
-    "/skill:ponytail-help",
+    "/skill:codecraft-review",
+    "/skill:codecraft-audit",
+    "/skill:codecraft-debt",
+    "/skill:codecraft-gain",
+    "/skill:codecraft-help",
   ]);
 });
 
 test("skill alias commands expand the skill and forward their arguments", async () => {
   const { commands, sentUserMessages } = createPiHarness();
 
-  await commands.get("ponytail-review").handler("staged", createCommandContext());
-  await commands.get("ponytail-audit").handler("src/api", createCommandContext({ isIdle: () => false }));
+  await commands.get("codecraft-review").handler("staged", createCommandContext());
+  await commands.get("codecraft-audit").handler("src/api", createCommandContext({ isIdle: () => false }));
 
   assert.deepEqual(sentUserMessages, [
-    { text: "/skill:ponytail-review staged", options: { expandPromptTemplates: true } },
-    { text: "/skill:ponytail-audit src/api", options: { expandPromptTemplates: true, deliverAs: "followUp" } },
+    { text: "/skill:codecraft-review staged", options: { expandPromptTemplates: true } },
+    { text: "/skill:codecraft-audit src/api", options: { expandPromptTemplates: true, deliverAs: "followUp" } },
   ]);
 });
 
@@ -259,7 +259,7 @@ test("normal mode disables persistent instructions", async () => withTempConfig(
   const ctx = createCommandContext();
 
   await events.get("session_start")({ reason: "startup" }, ctx);
-  await commands.get("ponytail").handler("ultra", ctx);
+  await commands.get("codecraft").handler("ultra", ctx);
   await events.get("input")({ text: "normal mode", source: "interactive" }, ctx);
 
   const disabled = await events.get("before_agent_start")({ systemPrompt: "BASE" }, ctx);
@@ -271,7 +271,7 @@ test("a request mentioning normal mode stays active", async () => withTempConfig
   const ctx = createCommandContext();
 
   await events.get("session_start")({ reason: "startup" }, ctx);
-  await commands.get("ponytail").handler("ultra", ctx);
+  await commands.get("codecraft").handler("ultra", ctx);
   await events.get("input")({ text: "add a normal mode toggle next to dark mode", source: "interactive" }, ctx);
 
   const result = await events.get("before_agent_start")({ systemPrompt: "BASE" }, ctx);
@@ -282,14 +282,14 @@ test("status bar renders the mode and flips active on agent_start", async () => 
   const { events } = createPiHarness();
   const statusWrites = [];
   const ctx = createCommandContext({
-    sessionManager: { getEntries: () => [{ type: "custom", customType: "ponytail-mode", data: { mode: "ultra" } }] },
+    sessionManager: { getEntries: () => [{ type: "custom", customType: "codecraft-mode", data: { mode: "ultra" } }] },
     ui: { notify() {}, setStatus: (key, text) => statusWrites.push({ key, text }), theme: { fg: (_color, text) => text } },
   });
 
   await events.get("session_start")({ reason: "resume" }, ctx);
   await events.get("agent_start")({}, ctx);
 
-  assert.equal(statusWrites.at(-2).key, "ponytail");
+  assert.equal(statusWrites.at(-2).key, "codecraft");
   assert.match(statusWrites.at(-2).text, /○.*ULTRA/);
   assert.match(statusWrites.at(-1).text, /●.*ULTRA/);
 }));
@@ -298,20 +298,20 @@ test("off mode clears the status bar entry", async () => withTempConfig(async ()
   const { events } = createPiHarness();
   const statusWrites = [];
   const ctx = createCommandContext({
-    sessionManager: { getEntries: () => [{ type: "custom", customType: "ponytail-mode", data: { mode: "off" } }] },
+    sessionManager: { getEntries: () => [{ type: "custom", customType: "codecraft-mode", data: { mode: "off" } }] },
     ui: { notify() {}, setStatus: (key, text) => statusWrites.push({ key, text }), theme: { fg: (_color, text) => text } },
   });
 
   await events.get("session_start")({ reason: "resume" }, ctx);
 
-  assert.deepEqual(statusWrites.at(-1), { key: "ponytail", text: undefined });
+  assert.deepEqual(statusWrites.at(-1), { key: "codecraft", text: undefined });
 }));
 
 test("status bar stays silent when ui lacks a theme", async () => withTempConfig(async () => {
   const { events } = createPiHarness();
   const calls = [];
   const ctx = createCommandContext({
-    sessionManager: { getEntries: () => [{ type: "custom", customType: "ponytail-mode", data: { mode: "ultra" } }] },
+    sessionManager: { getEntries: () => [{ type: "custom", customType: "codecraft-mode", data: { mode: "ultra" } }] },
     ui: { notify() {}, setStatus: (_key, text) => calls.push(text) }, // setStatus present, theme absent
   });
 
@@ -321,12 +321,12 @@ test("status bar stays silent when ui lacks a theme", async () => withTempConfig
   assert.deepEqual(calls, []);
 }));
 
-test("PONYTAIL_HIDE_STATUS hides the indicator but keeps ponytail active (#324)", async () => withTempConfig(async () => {
+test("CODECRAFT_HIDE_STATUS hides the indicator but keeps codecraft active (#324)", async () => withTempConfig(async () => {
   process.env.PONYTAIL_HIDE_STATUS = "1";
   const { events } = createPiHarness();
   const statusWrites = [];
   const ctx = createCommandContext({
-    sessionManager: { getEntries: () => [{ type: "custom", customType: "ponytail-mode", data: { mode: "ultra" } }] },
+    sessionManager: { getEntries: () => [{ type: "custom", customType: "codecraft-mode", data: { mode: "ultra" } }] },
     ui: { notify() {}, setStatus: (key, text) => statusWrites.push({ key, text }), theme: { fg: (_c, t) => t } },
   });
 
@@ -338,9 +338,9 @@ test("PONYTAIL_HIDE_STATUS hides the indicator but keeps ponytail active (#324)"
   assert.match(injected.systemPrompt, /CODECRAFT MODE ACTIVE/, "ruleset must still inject while status is hidden");
 }));
 
-test("config.hideStatus hides the indicator but keeps ponytail active (#324)", async () => withTempConfig(async () => {
-  mkdirSync(join(process.env.XDG_CONFIG_HOME, "ponytail"), { recursive: true });
-  writeFileSync(join(process.env.XDG_CONFIG_HOME, "ponytail", "config.json"), JSON.stringify({ hideStatus: true }));
+test("config.hideStatus hides the indicator but keeps codecraft active (#324)", async () => withTempConfig(async () => {
+  mkdirSync(join(process.env.XDG_CONFIG_HOME, "codecraft"), { recursive: true });
+  writeFileSync(join(process.env.XDG_CONFIG_HOME, "codecraft", "config.json"), JSON.stringify({ hideStatus: true }));
   const { events } = createPiHarness();
   const statusWrites = [];
   const ctx = createCommandContext({
@@ -360,7 +360,7 @@ test("PONYTAIL_HIDE_STATUS=0 does not hide the indicator", async () => withTempC
   const { events } = createPiHarness();
   const statusWrites = [];
   const ctx = createCommandContext({
-    sessionManager: { getEntries: () => [{ type: "custom", customType: "ponytail-mode", data: { mode: "ultra" } }] },
+    sessionManager: { getEntries: () => [{ type: "custom", customType: "codecraft-mode", data: { mode: "ultra" } }] },
     ui: { notify() {}, setStatus: (key, text) => statusWrites.push({ key, text }), theme: { fg: (_c, t) => t } },
   });
 
@@ -370,9 +370,9 @@ test("PONYTAIL_HIDE_STATUS=0 does not hide the indicator", async () => withTempC
   assert.ok(statusWrites.length > 0, "0 must be treated as 'do not hide'");
 }));
 
-test("/ponytail autocompletes modes, commands and default <mode>", () => {
+test("/codecraft autocompletes modes, commands and default <mode>", () => {
   const { commands } = createPiHarness();
-  const complete = (prefix) => commands.get("ponytail").getArgumentCompletions(prefix);
+  const complete = (prefix) => commands.get("codecraft").getArgumentCompletions(prefix);
 
   assert.deepEqual(complete("").map((item) => item.value),
     ["off", "lite", "full", "ultra", "status", "default off", "default lite", "default full", "default ultra"]);

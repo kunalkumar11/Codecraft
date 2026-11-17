@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // Smoke test for the Gemini CLI adapter. The adapter is a single thin manifest
 // (gemini-extension.json) that reuses the repo's existing files: AGENTS.md for
-// always-on context, commands/*.toml for /ponytail + /ponytail-review, and
+// always-on context, commands/*.toml for /codecraft + /codecraft-review, and
 // skills/ for the agent skills. This test fails if the manifest is removed,
 // loses its pinned version, or points contextFileName at a file that no longer
-// carries the load-bearing rules — i.e. if the adapter stops wiring ponytail.
+// carries the load-bearing rules — i.e. if the adapter stops wiring codecraft.
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -13,7 +13,7 @@ const path = require('path');
 
 const root = path.join(__dirname, '..');
 const MANIFEST = 'gemini-extension.json';
-const EXTENSION_NAME = 'ponytail';
+const EXTENSION_NAME = 'codecraft';
 // Floating refs are a supply-chain footgun; the manifest version must be pinned.
 const PINNED_SEMVER = /^\d+\.\d+\.\d+$/;
 const VERSIONED_MANIFESTS = [
@@ -23,8 +23,8 @@ const VERSIONED_MANIFESTS = [
   '.github/plugin/plugin.json',
 ];
 // Gemini auto-discovers these by directory; the manifest is only useful if they exist.
-const REUSED_COMMANDS = ['commands/codecraft.toml', 'commands/codecraft-review.toml', 'commands/ponytail.toml', 'commands/ponytail-review.toml'];
-const REUSED_SKILLS = ['skills/codecraft/SKILL.md', 'skills/ponytail/SKILL.md'];
+const REUSED_COMMANDS = ['commands/codecraft.toml', 'commands/codecraft-review.toml', 'commands/codecraft.toml', 'commands/codecraft-review.toml'];
+const REUSED_SKILLS = ['skills/codecraft/SKILL.md', 'skills/codecraft/SKILL.md'];
 // Gemini CLI auto-loads this exact path for extension hooks. Ponytail's
 // Claude/Codex hook map uses events Gemini does not support, so it must stay
 // behind the host-specific plugin manifests instead.

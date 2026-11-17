@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/test.yml
 
   publish:
-    if: ${{ github.repository == 'DietrichGebert/ponytail' }}
+    if: ${{ github.repository == 'kunalkumar11/codecraft' }}
     needs: test
     runs-on: ubuntu-latest
     permissions:

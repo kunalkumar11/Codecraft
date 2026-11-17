@@ -15,12 +15,12 @@ const REQUIRED_COMMAND_FILES = [
   'codecraft-debt.toml',
   'codecraft-gain.toml',
   'codecraft-help.toml',
-  'ponytail.toml',
-  'ponytail-review.toml',
-  'ponytail-audit.toml',
-  'ponytail-debt.toml',
-  'ponytail-gain.toml',
-  'ponytail-help.toml',
+  'codecraft.toml',
+  'codecraft-review.toml',
+  'codecraft-audit.toml',
+  'codecraft-debt.toml',
+  'codecraft-gain.toml',
+  'codecraft-help.toml',
 ];
 
 function readJSON(relPath) {
@@ -29,7 +29,7 @@ function readJSON(relPath) {
 
 test('copilot plugin provides CodeCraft commands and legacy Ponytail aliases', () => {
   const manifest = readJSON('.github/plugin/plugin.json');
-  assert.equal(manifest.name, 'ponytail');
+  assert.equal(manifest.name, 'codecraft');
   assert.equal(manifest.commands, 'commands/');
 
   for (const file of REQUIRED_COMMAND_FILES) {

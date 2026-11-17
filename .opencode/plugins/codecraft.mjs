@@ -1,13 +1,13 @@
-// ponytail — OpenCode plugin.
+// codecraft — OpenCode plugin.
 //
-// Injects the ponytail ruleset into every chat's system prompt at the active
-// intensity, persists /ponytail mode switches, and registers the /ponytail
+// Injects the codecraft ruleset into every chat's system prompt at the active
+// intensity, persists /codecraft mode switches, and registers the /codecraft
 // commands and skills so they work when the package is installed from npm.
 // Reuses the shared instruction builder so Claude Code, Codex, pi, and OpenCode
 // all read one source of truth.
 //
 // OpenCode loads this as a server plugin — add it to your opencode.json:
-//   { "plugins": ["@dietrichgebert/ponytail"] }
+//   { "plugins": ["@dietrichgebert/codecraft"] }
 //
 // One default export serves both plugin APIs: V2 reads `id` + `setup`, V1 calls
 // `server()`.
@@ -22,16 +22,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // The shared instruction builder is CommonJS; bridge to it from this ES module.
 const require = createRequire(import.meta.url);
-const { getPonytailInstructions } = require('../../hooks/ponytail-instructions');
-const { getDefaultMode, normalizeMode, writeDefaultMode } = require('../../hooks/ponytail-config');
-const { parseCommandFile, parseSkillFile } = require('./ponytail-frontmatter.cjs');
+const { getPonytailInstructions } = require('../../hooks/codecraft-instructions');
+const { getDefaultMode, normalizeMode, writeDefaultMode } = require('../../hooks/codecraft-config');
+const { parseCommandFile, parseSkillFile } = require('./codecraft-frontmatter.cjs');
 
 // OpenCode has no flag-file convention of its own; keep mode beside its config.
 // Shared with the V1 path, so a level set under either API is read by both.
 const statePath = path.join(
   process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config'),
   'opencode',
-  '.ponytail-active',
+  '.codecraft-active',
 );
 
 function readMode() {
@@ -54,19 +54,19 @@ function writeMode(mode) {
 // synchronous store if same-turn switching ever matters.
 function persistMode(args) {
   const wanted = String(args == null ? '' : args).trim();
-  // `/ponytail default <level>` saves the default for new sessions, like the Claude hook.
+  // `/codecraft default <level>` saves the default for new sessions, like the Claude hook.
   const [first, second] = wanted.toLowerCase().split(/\s+/);
   if (first === 'default') {
     const saved = writeDefaultMode(second);
-    if (saved) console.log('ponytail default ' + saved);
+    if (saved) console.log('codecraft default ' + saved);
     return;
   }
-  // Bare /ponytail switches ponytail on, or keeps the level when it already is (#639).
+  // Bare /codecraft switches codecraft on, or keeps the level when it already is (#639).
   if (!wanted && readMode() !== 'off') return;
   const mode = wanted ? normalizeMode(wanted) : (getDefaultMode() === 'off' ? 'full' : getDefaultMode());
   if (!mode) return;
   writeMode(mode);
-  console.log('ponytail ' + mode);
+  console.log('codecraft ' + mode);
 }
 
 // V2 has no `config` hook: the domains that own these definitions own them now,
@@ -110,7 +110,7 @@ function readSkills() {
 }
 
 // Templates without $ARGUMENTS would drop what the user typed after the
-// command (/ponytail-review feature/login), so append it instead.
+// command (/codecraft-review feature/login), so append it instead.
 function withArguments(template, input) {
   const text = String(input == null ? '' : input);
   if (template.includes('$ARGUMENTS')) return template.replaceAll('$ARGUMENTS', text);
@@ -118,7 +118,7 @@ function withArguments(template, input) {
 }
 
 export default {
-  id: 'ponytail',
+  id: 'codecraft',
 
   async setup(ctx) {
     const commands = readCommands();
@@ -134,7 +134,7 @@ export default {
           name: command.name,
           description: command.description,
           execute: async ({ sessionID, prompt, delivery }) => {
-            if (command.name === 'ponytail' || command.name === 'codecraft') persistMode(prompt.text);
+            if (command.name === 'codecraft' || command.name === 'codecraft') persistMode(prompt.text);
             const withoutMentions = (items) => items?.map(({ mention, ...item }) => item);
             await ctx.session.prompt({
               ...prompt,
@@ -166,7 +166,7 @@ export default {
   // OpenCode V1: same three behaviors, as hooks on the V1 hook names.
   async server({ client } = {}) {
     const log = (level, message) => {
-      try { client && client.app && client.app.log({ body: { service: 'ponytail', level, message } }); } catch (e) {}
+      try { client && client.app && client.app.log({ body: { service: 'codecraft', level, message } }); } catch (e) {}
     };
 
     return {
@@ -179,9 +179,9 @@ export default {
 
         config.skills = config.skills || {};
         config.skills.paths = config.skills.paths || [];
-        const ponytailSkillsDir = path.resolve(__dirname, '../../skills');
-        if (!config.skills.paths.includes(ponytailSkillsDir)) {
-          config.skills.paths.push(ponytailSkillsDir);
+        const codecraftSkillsDir = path.resolve(__dirname, '../../skills');
+        if (!config.skills.paths.includes(codecraftSkillsDir)) {
+          config.skills.paths.push(codecraftSkillsDir);
         }
       },
 
@@ -197,9 +197,9 @@ export default {
       },
 
       'command.execute.before': async (input) => {
-        if (!input || !['ponytail', 'codecraft'].includes(input.command)) return;
+        if (!input || !['codecraft', 'codecraft'].includes(input.command)) return;
         persistMode(input.arguments);
-        log('info', 'ponytail ' + readMode());
+        log('info', 'codecraft ' + readMode());
       },
     };
   },

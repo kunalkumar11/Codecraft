@@ -1,7 +1,7 @@
 ---
 name: codecraft-help
 description: "Quick reference for CodeCraft modes, skills, and commands. One-shot display."
-homepage: https://github.com/DietrichGebert/ponytail
+homepage: https://github.com/kunalkumar11/Codecraft
 license: MIT
 ---
 

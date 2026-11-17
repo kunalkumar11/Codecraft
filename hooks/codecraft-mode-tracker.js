@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// ponytail — UserPromptSubmit hook to track which ponytail mode is active
-// Inspects user input for /ponytail commands and writes mode to flag file
+// codecraft — UserPromptSubmit hook to track which codecraft mode is active
+// Inspects user input for /codecraft commands and writes mode to flag file
 
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
-const { getClaudeDir, getDefaultMode, isDeactivationCommand, writeDefaultMode } = require('./ponytail-config');
+const { getClaudeDir, getDefaultMode, isDeactivationCommand, writeDefaultMode } = require('./codecraft-config');
 const {
   clearMode,
   cursorRuleNotice,
@@ -18,8 +18,8 @@ const {
   readMode,
   setMode,
   writeHookOutput,
-} = require('./ponytail-runtime');
-const { getPonytailInstructions } = require('./ponytail-instructions');
+} = require('./codecraft-runtime');
+const { getPonytailInstructions } = require('./codecraft-instructions');
 
 let input = '';
 let done = false;
@@ -36,7 +36,7 @@ function finish() {
     // switch off a rule, so answer the command with the notice instead of
     // writing a mode the rule would contradict (#817). Ordinary prompts
     // stay silent as usual.
-    if (isCursor && (/^[/@$](?:codecraft|ponytail)/.test(prompt) || isDeactivationCommand(prompt))) {
+    if (isCursor && (/^[/@$](?:codecraft|codecraft)/.test(prompt) || isDeactivationCommand(prompt))) {
       const rule = cursorRulePath();
       if (rule) {
         writeHookOutput('UserPromptSubmit', readMode() || 'off', cursorRuleNotice(rule));
@@ -44,25 +44,25 @@ function finish() {
       }
     }
 
-    // Match /ponytail commands
+    // Match /codecraft commands
     let modeSwitched = false;
     let deactivated = false;
     let defaultNotice = '';
-    if (/^[/@$](?:codecraft|ponytail)/.test(prompt)) {
+    if (/^[/@$](?:codecraft|codecraft)/.test(prompt)) {
       const parts = prompt.split(/\s+/);
       const cmd = parts[0].replace(/^[@$]/, '/')
-        .replace(/^\/codecraft:codecraft$/, '/ponytail:ponytail')
-        .replace(/^\/codecraft$/, '/ponytail');
+        .replace(/^\/codecraft:codecraft$/, '/codecraft:codecraft')
+        .replace(/^\/codecraft$/, '/codecraft');
       const arg = parts[1] || '';
 
       let mode = null;
       let isReportOnly = false;
 
-      // /ponytail-review is a one-shot skill, not a session level (#736).
+      // /codecraft-review is a one-shot skill, not a session level (#736).
       // Matching it here used to setMode('review'), which latched
       // INDEPENDENT_MODES for the rest of the session.
-      if (cmd === '/ponytail' || cmd === '/ponytail:ponytail') {
-        // `/ponytail default <mode>` persists the default to config (survives
+      if (cmd === '/codecraft' || cmd === '/codecraft:codecraft') {
+        // `/codecraft default <mode>` persists the default to config (survives
         // restarts). Plain switches stay session-scoped ("sticks until session
         // end"), so this is the only path that writes config. review is not a
         // valid default (#377), so only off/lite/full/ultra are accepted.
@@ -77,19 +77,19 @@ function finish() {
           // notice into it. mode stays null, so the session level is untouched.
           if (!isQoder) return; // don't fall through to the session-mode switch
         }
-        // `/ponytail band [on|off]` shows or hides the band above the Claude Code
+        // `/codecraft band [on|off]` shows or hides the band above the Claude Code
         // prompt (hooks/band reads this flag). It outlives the session; absent = shown.
         // Other hosts have no band, so there the word stays an unknown argument.
         if (arg === 'band' && !isCopilot && !isCodex && !isQoder && !isCodeBuddy && !isCursor) {
-          // `/ponytail band import`: past sessions into the board, in the background, so the prompt
+          // `/codecraft band import`: past sessions into the board, in the background, so the prompt
           // is answered right away while the transcripts are read. Detached, it outlives this hook's
           // process.exit below.
           if (parts[2] === 'import') {
-            spawn(process.execPath, [path.join(__dirname, 'ponytail-band-import.js')], { detached: true, stdio: 'ignore' });
+            spawn(process.execPath, [path.join(__dirname, 'codecraft-band-import.js')], { detached: true, stdio: 'ignore' });
             writeHookOutput('UserPromptSubmit', readMode() || 'off', 'CODECRAFT BAND IMPORT: past Claude Code sessions (cost, agent time, tokens) are being added to the board in the background. Open the board in a minute. Confirm in one short line.');
             return;
           }
-          const flag = path.join(getClaudeDir(), '.ponytail-band');
+          const flag = path.join(getClaudeDir(), '.codecraft-band');
           let hidden = false;
           try { hidden = fs.readFileSync(flag, 'utf8').trim() === 'off'; } catch (e) {}
           const show = parts[2] === 'on' ? true : parts[2] === 'off' ? false : hidden;
@@ -100,8 +100,8 @@ function finish() {
             fs.writeFileSync(flag, 'off');
           }
           writeHookOutput('UserPromptSubmit', readMode() || 'off', show
-            ? 'CODECRAFT BAND ON: the band shows above the prompt again. The ponytail level is unchanged. Confirm in one short line.'
-            : 'CODECRAFT BAND OFF: the band above the prompt is hidden, `/ponytail band` brings it back. The ponytail level is unchanged. Confirm in one short line.');
+            ? 'CODECRAFT BAND ON: the band shows above the prompt again. The codecraft level is unchanged. Confirm in one short line.'
+            : 'CODECRAFT BAND OFF: the band above the prompt is hidden, `/codecraft band` brings it back. The codecraft level is unchanged. Confirm in one short line.');
           return;
         }
         if (arg === 'lite') mode = 'lite';
@@ -109,7 +109,7 @@ function finish() {
         else if (arg === 'ultra') mode = 'ultra';
         else if (arg === 'off') mode = 'off';
         else if (arg === '') {
-          // Bare /ponytail switches ponytail on: off → the default level (full if
+          // Bare /codecraft switches codecraft on: off → the default level (full if
           // the default is off too); already on → keep the level, report it (#639).
           const live = readMode();
           if (live && live !== 'off') {
@@ -134,11 +134,11 @@ function finish() {
       } else if (mode && mode !== 'off') {
         setMode(mode);
         modeSwitched = true;
-        // ponytail: Qoder needs the full ruleset every turn, so when a mode
+        // codecraft: Qoder needs the full ruleset every turn, so when a mode
         // switch happens we fold the confirmation into the ruleset output
         // below (one JSON on stdout) instead of emitting two separate writes.
         if (!isQoder) {
-          // Cursor (#817) and Codex have no /ponytail command that would load
+          // Cursor (#817) and Codex have no /codecraft command that would load
           // the skill body for the new level, and the SessionStart ruleset is
           // filtered to the start level, so the tracker delivers that level's
           // ruleset along with the confirmation.
@@ -170,8 +170,8 @@ function finish() {
     // Qoder has no SessionStart event, so UserPromptSubmit does double duty:
     // activate the default mode on first prompt (if no flag exists yet), then
     // inject the ruleset on every prompt. Claude Code/Codex do this in
-    // SessionStart via ponytail-activate.js; Qoder can't, so we do it here.
-    // Skip when deactivated — user just turned ponytail off.
+    // SessionStart via codecraft-activate.js; Qoder can't, so we do it here.
+    // Skip when deactivated — user just turned codecraft off.
     if (isQoder && !deactivated) {
       let currentMode = readMode();
       if (!currentMode) {
@@ -182,7 +182,7 @@ function finish() {
         }
       }
       if (currentMode && currentMode !== 'off') {
-        // ponytail: one JSON per invocation — mode-switch confirmation is
+        // codecraft: one JSON per invocation — mode-switch confirmation is
         // folded into the ruleset header so Qoder gets both in one write.
         const header = (defaultNotice ? defaultNotice + '\n\n' : '') + (modeSwitched
           ? 'CODECRAFT MODE CHANGED — level: ' + currentMode + '\n\n'

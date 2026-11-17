@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// ponytail — install or remove the Cursor hooks (hooks/cursor-hooks.json) in
+// codecraft — install or remove the Cursor hooks (hooks/cursor-hooks.json) in
 // ~/.cursor/hooks.json (default) or <cwd>/.cursor/hooks.json (--project),
 // merging with whatever hooks are already there. Only entries that run one of
-// ponytail's own hooks/ponytail-*.js scripts are added or removed; every other
+// codecraft's own hooks/codecraft-*.js scripts are added or removed; every other
 // hook stays as it was.
 //
 //   node scripts/cursor-hooks.js install [--project]
@@ -11,11 +11,11 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { isShellSafe } = require('../hooks/ponytail-config');
+const { isShellSafe } = require('../hooks/codecraft-config');
 
 const ROOT = path.join(__dirname, '..');
 const TEMPLATE = path.join(ROOT, 'hooks', 'cursor-hooks.json');
-const PONYTAIL_HOOK = /[\\/]hooks[\\/]ponytail-[\w-]+\.js(?=["'\s]|$)/;
+const PONYTAIL_HOOK = /[\\/]hooks[\\/]codecraft-[\w-]+\.js(?=["'\s]|$)/;
 
 function isPonytailHook(entry) {
   return Boolean(entry && typeof entry.command === 'string' && PONYTAIL_HOOK.test(entry.command));
@@ -60,10 +60,10 @@ function writeConfig(file, config) {
 // path. Forward slashes run unchanged under cmd, PowerShell and bash, and the
 // same allowlist that guards the statusline snippet keeps shell metacharacters
 // out of the command string.
-function ponytailEntries() {
+function codecraftEntries() {
   const root = ROOT.replace(/\\/g, '/');
   if (!isShellSafe(root)) {
-    throw new Error('ponytail is checked out at a path with shell metacharacters (' + ROOT +
+    throw new Error('codecraft is checked out at a path with shell metacharacters (' + ROOT +
       '); move it, or copy hooks/cursor-hooks.json by hand and quote the path for your shell');
   }
   const template = JSON.parse(fs.readFileSync(TEMPLATE, 'utf8'));
@@ -87,16 +87,16 @@ function install(scope) {
   const file = hooksPath(scope);
   const config = readConfig(file);
   if (config.version === undefined) config.version = 1;
-  // Re-running replaces stale ponytail entries instead of duplicating them.
+  // Re-running replaces stale codecraft entries instead of duplicating them.
   stripPonytail(config);
-  for (const [event, entries] of Object.entries(ponytailEntries())) {
+  for (const [event, entries] of Object.entries(codecraftEntries())) {
     config.hooks[event] = [...(config.hooks[event] || []), ...entries];
   }
   writeConfig(file, config);
   return file;
 }
 
-// Returns the file it changed, or null when there was nothing of ponytail's in it.
+// Returns the file it changed, or null when there was nothing of codecraft's in it.
 function uninstall(scope) {
   const file = hooksPath(scope);
   if (!fs.existsSync(file)) return null;
@@ -106,7 +106,7 @@ function uninstall(scope) {
   if (JSON.stringify(config) === before) return null;
   const otherKeys = Object.keys(config).filter((k) => k !== 'version' && k !== 'hooks');
   if (Object.keys(config.hooks).length === 0 && otherKeys.length === 0) {
-    // Only ponytail lived here: drop the file rather than leave an empty husk.
+    // Only codecraft lived here: drop the file rather than leave an empty husk.
     fs.unlinkSync(file);
   } else {
     writeConfig(file, config);

@@ -9,7 +9,7 @@ const root = path.join(__dirname, '..');
 
 for (const scenario of ['blocked', 'failed', 'oversized', 'successful', 'disabled']) {
   test(`SessionStart preserves instructions when the optional map is ${scenario}`, (t) => {
-    const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'ponytail activation '));
+    const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'codecraft activation '));
     t.after(() => fs.rmSync(temp, { recursive: true, force: true }));
     const hooks = path.join(temp, 'plugin', 'hooks');
     const workspace = path.join(temp, 'workspace');
@@ -25,12 +25,12 @@ for (const scenario of ['blocked', 'failed', 'oversized', 'successful', 'disable
         oversized: 'return "x".repeat(100000);',
         disabled: 'require("node:fs").writeFileSync("map-ran", "yes"); return "unexpected map";',
       }[scenario];
-      fs.writeFileSync(path.join(hooks, 'ponytail-map.js'),
+      fs.writeFileSync(path.join(hooks, 'codecraft-map.js'),
         `exports.buildMap = () => { ${body} };\n` +
         'if (require.main === module) process.stdout.write(exports.buildMap());\n');
     }
 
-    const result = spawnSync(process.execPath, [path.join(hooks, 'ponytail-activate.js')], {
+    const result = spawnSync(process.execPath, [path.join(hooks, 'codecraft-activate.js')], {
       cwd: workspace,
       input: '',
       encoding: 'utf8',

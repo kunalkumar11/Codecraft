@@ -1,7 +1,7 @@
 ---
 name: codecraft-gain
 description: "CodeCraft measured impact scoreboard: less code, less cost, more speed, from benchmark averages."
-homepage: https://github.com/DietrichGebert/ponytail
+homepage: https://github.com/kunalkumar11/Codecraft
 license: MIT
 ---
 

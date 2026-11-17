@@ -41,7 +41,7 @@ CodeCraft is a **compatibility-preserving derivative of [Ponytail](https://githu
 - **Python 3.10+** (for Hermes adapter & Python checks)
 - **Git** (for debt-scan & benchmark)
 
-### Install & Verify
+### Install & Verify (One Command!)
 ```bash
 # 1. Clone
 git clone https://github.com/kunalkumar11/Codecraft.git
@@ -50,9 +50,15 @@ cd Codecraft
 # 2. Install deps
 npm install
 
-# 3. Run tests (should show 6 passing)
-node --test tests/commands.test.js
+# 3. Install for ALL detected agents automatically
+npm run setup
+
+# 4. Run tests (should show 168 passing)
+npm test
 ```
+
+### 📖 Simple Install Guide
+> **New to this?** See [SIMPLE_INSTALL.md](SIMPLE_INSTALL.md) — step-by-step with screenshots, troubleshooting, and per-agent instructions.
 
 ### Use It (Inside an AI Assistant)
 
@@ -66,6 +72,19 @@ node --test tests/commands.test.js
 | **Codex CLI** | Run `codex` → type `/codecraft-help` |
 | **Claude Code CLI** | Run `claude-code` → type `/codecraft-help` |
 | **OpenCode** | Run `opencode` → type `/codecraft-help` |
+| **Grok Build** | Run `grok` → type `/codecraft-help` |
+| **Gemini CLI** | Run `gemini` → type `/codecraft-help` |
+| **Kimi Code** | Run `kimi` → type `/codecraft-help` |
+| **Qoder** | Run `qoder` → type `/codecraft-help` |
+
+### Verify Installation
+```bash
+# Check what's installed where
+npm run doctor
+
+# Test a command in your agent
+/codecraft-help
+```
 
 ---
 

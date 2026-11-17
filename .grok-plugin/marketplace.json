@@ -1,16 +1,17 @@
 {
-  "name": "ponytail",
-  "description": "CodeCraft is a Ponytail-compatible derivative with engineering guidance for AI coding agents.",
+  "name": "codecraft",
+  "description": "CodeCraft (Ponytail-compatible): Lazy senior dev mode for AI coding agents. YAGNI, stdlib first, minimal changes that fully solve the problem. Skill-only integration for Grok Build.",
   "owner": {
     "name": "Dietrich Gebert",
     "url": "https://github.com/DietrichGebert"
   },
   "plugins": [
     {
-      "name": "ponytail",
-      "description": "CodeCraft adds practical engineering guidance while preserving Ponytail-compatible commands.",
+      "name": "codecraft",
+      "description": "Lazy senior dev mode for coding tasks: the smallest change that fully solves it, and a reply a busy human understands in one read. Auto-invoked by Grok on coding tasks.",
       "source": "./skills",
-      "category": "productivity"
+      "category": "productivity",
+      "tags": ["yagni", "minimalism", "code-review", "productivity", "ai-coding-agent"]
     }
   ]
 }

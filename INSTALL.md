@@ -6,23 +6,45 @@ The standalone Python audit tool needs Python 3.10 or newer and no pip packages:
 `python tools/codecraft_python_audit.py PATH`. Development and test setup is in
 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
+> 📖 **New to this?** See [SIMPLE_INSTALL.md](SIMPLE_INSTALL.md) for a beginner-friendly step-by-step guide with troubleshooting.
+
+## 🚀 One-Command Install (Recommended)
+
+```bash
+# Clone and install for all detected agents
+git clone https://github.com/kunalkumar11/Codecraft.git
+cd Codecraft
+npm install
+npm run setup
+
+# Or install for specific agents only
+npm run setup -- --agent claude,codex,grok,cursor
+```
+
+The installer detects available agents and sets up plugins, hooks, skills, and commands automatically.
+
+## Manual Install Per Agent
+
 Pick your agent below. Not listed? Most agents read [`AGENTS.md`](AGENTS.md): copy it into your project, or ask your agent to install [`skills/codecraft/SKILL.md`](skills/codecraft/SKILL.md) as a skill. Which files map to which agent: [Agent portability](docs/agent-portability.md).
 
 The Claude Code and Codex plugins (and the Cursor hooks) run two tiny Node.js lifecycle hooks, so `node` needs to be on your PATH (note for Nix/nvm users: it must be on the non-interactive shell's PATH). If it isn't, the skills still work, but every hook call shows a harmless `node: command not found` error; installing Node (or putting it on that PATH) makes it go away.
 
 ## Claude Code
 
+### Option A: Via marketplace (recommended for most users)
 ```
-/plugin marketplace add DietrichGebert/ponytail
+/plugin marketplace add kunalkumar11/Codecraft
+/plugin install codecraft@codecraft
 ```
-```
-/plugin install ponytail@ponytail
-```
-(You have to send two separate prompts for the install to work) 
+(You have to send two separate prompts for the install to work)
 
 Same steps in the Claude Code Desktop app's Code tab: type the two `/plugin` commands above into the prompt box, or click the **+** button next to it, choose **Plugins** → **Add plugin** to browse your configured marketplaces, and manage marketplaces from **Customize** in the sidebar.
 
-CodeBuddy installs the same plugin with the same two `/plugin` commands and switches levels with `/ponytail ultra` and so on; it has no subagent injection.
+### Option B: Local development (from this checkout)
+```
+npm run setup -- --agent claude
+```
+This copies the plugin directly to `~/.claude/plugins/codecraft/` — no marketplace needed.
 
 ## Codex
 

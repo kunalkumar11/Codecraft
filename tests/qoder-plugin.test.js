@@ -29,7 +29,7 @@ function readJSON(relPath) {
 
 test('qoder plugin manifest exists and has required fields', () => {
   const manifest = readJSON('.qoder-plugin/plugin.json');
-  assert.equal(manifest.name, 'ponytail');
+  assert.equal(manifest.name, 'codecraft');
   assert.ok(manifest.version, 'manifest must declare a version');
   assert.ok(manifest.description, 'manifest must declare a description');
   assert.ok(manifest.author, 'manifest must declare an author');

@@ -1,17 +1,18 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "ponytail",
-  "description": "CodeCraft is a Ponytail-compatible derivative with practical engineering guidance for AI coding agents.",
+  "name": "codecraft",
+  "description": "CodeCraft (Ponytail-compatible): Lazy senior dev mode for AI coding agents. YAGNI, stdlib first, minimal changes that fully solve the problem. Works across Claude, Codex, Cursor, Grok, OpenCode, Gemini, and more.",
   "owner": {
     "name": "Dietrich Gebert",
     "url": "https://github.com/DietrichGebert"
   },
   "plugins": [
     {
-      "name": "ponytail",
-      "description": "CodeCraft adds practical engineering guidance while preserving Ponytail-compatible commands.",
+      "name": "codecraft",
+      "description": "Lazy senior dev mode: the smallest change that fully solves it, and a reply a busy human understands in one read. Levels: lite/full/ultra. Skills: review, audit, debt, gain, help.",
       "source": "./",
-      "category": "productivity"
+      "category": "productivity",
+      "tags": ["yagni", "minimalism", "code-review", "productivity", "ai-coding-agent"]
     }
   ]
 }

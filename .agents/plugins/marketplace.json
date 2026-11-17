@@ -1,21 +1,25 @@
 {
-  "name": "ponytail",
+  "name": "codecraft",
+  "description": "CodeCraft (Ponytail-compatible): Lazy senior dev mode for AI coding agents. YAGNI, stdlib first, minimal changes that fully solve the problem.",
   "interface": {
-    "displayName": "CodeCraft"
+    "displayName": "CodeCraft",
+    "shortDescription": "Lazy senior dev mode for AI coding agents"
   },
   "plugins": [
     {
-      "name": "ponytail",
+      "name": "codecraft",
+      "description": "Lazy senior dev mode: the smallest change that fully solves it, and a reply a busy human understands in one read. Levels: lite/full/ultra. Skills: review, audit, debt, gain, help.",
       "source": {
         "source": "url",
-        "url": "https://github.com/DietrichGebert/ponytail.git",
+        "url": "https://github.com/kunalkumar11/Codecraft.git",
         "ref": "main"
       },
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
       },
-      "category": "Productivity"
+      "category": "Productivity",
+      "tags": ["yagni", "minimalism", "code-review", "productivity", "ai-coding-agent"]
     }
   ]
 }

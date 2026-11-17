@@ -1,17 +1,17 @@
 {
-  "name": "ponytail",
-  "description": "Lazy senior dev mode for AI agents. The best code is the code you never wrote.",
+  "name": "codecraft",
+  "description": "CodeCraft (Ponytail-compatible): Lazy senior dev mode for AI coding agents. YAGNI, stdlib first, minimal changes that fully solve the problem. Works across GitHub Copilot, Claude, Codex, Cursor, Grok, and more.",
   "owner": {
     "name": "Dietrich Gebert",
     "url": "https://github.com/DietrichGebert"
   },
   "plugins": [
     {
-      "name": "ponytail",
-      "description": "Forces the laziest solution that works. YAGNI, stdlib first, one line over fifty.",
+      "name": "codecraft",
+      "description": "Lazy senior dev mode: the smallest change that fully solves it, and a reply a busy human understands in one read. Levels: lite/full/ultra. Skills: review, audit, debt, gain, help.",
       "source": "./",
       "category": "productivity",
-      "tags": ["yagni", "minimalism", "code-review", "productivity"],
+      "tags": ["yagni", "minimalism", "code-review", "productivity", "ai-coding-agent"],
       "commands": "commands/",
       "skills": "skills/",
       "hooks": "hooks/copilot-hooks.json"

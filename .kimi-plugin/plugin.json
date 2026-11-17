@@ -1,15 +1,16 @@
 {
-  "name": "ponytail",
-  "description": "CodeCraft is a Ponytail-compatible derivative with engineering guidance for coding agents.",
+  "name": "codecraft",
+  "description": "CodeCraft (Ponytail-compatible): Lazy senior dev mode for AI coding agents. YAGNI, stdlib first, minimal changes that fully solve the problem.",
   "author": {
     "name": "Dietrich Gebert",
     "url": "https://github.com/DietrichGebert"
   },
-  "homepage": "https://github.com/DietrichGebert/ponytail",
+  "homepage": "https://github.com/kunalkumar11/Codecraft",
   "license": "MIT",
   "interface": {
     "displayName": "CodeCraft",
-    "shortDescription": "Engineering guidance for AI coding agents."
+    "shortDescription": "Lazy senior dev mode for AI coding agents.",
+    "longDescription": "The smallest change that fully solves the problem. YAGNI, stdlib first, no unrequested abstractions. Levels: lite/full/ultra. Skills: review, audit, debt, gain, help."
   },
   "skills": "./skills/",
   "systemPromptPath": "./AGENTS.md"

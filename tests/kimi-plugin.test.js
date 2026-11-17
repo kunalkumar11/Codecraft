@@ -14,7 +14,7 @@ const root = path.join(__dirname, '..');
 
 test('Kimi manifest points at AGENTS.md and CodeCraft plus legacy skills', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(root, '.kimi-plugin', 'plugin.json'), 'utf8'));
-  assert.equal(manifest.name, 'ponytail');
+  assert.equal(manifest.name, 'codecraft');
   // Kimi ignores a systemPromptPath file over 32 KB.
   assert.ok(fs.statSync(path.join(root, manifest.systemPromptPath)).size < 32 * 1024);
   assert.match(fs.readFileSync(path.join(root, manifest.systemPromptPath), 'utf8'), /lazy senior/);

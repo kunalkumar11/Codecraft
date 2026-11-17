@@ -251,7 +251,11 @@ async function installCodex(opts) {
   fs.mkdirSync(targetDir, { recursive: true });
   copyDir(pluginDir, targetDir);
 
-  console.log(`  ✅ ${AGENTS.codex.name}: Installed plugin`);
+  // Codex plugin.json references ./skills/ and ./hooks/ — copy them
+  copyDir(path.join(root, 'skills'), path.join(targetDir, 'skills'));
+  copyDir(path.join(root, 'hooks'), path.join(targetDir, 'hooks'));
+
+  console.log(`  ✅ ${AGENTS.codex.name}: Installed plugin + skills + hooks`);
   return true;
 }
 
@@ -268,7 +272,10 @@ async function installGrok(opts) {
   fs.mkdirSync(targetDir, { recursive: true });
   copyDir(pluginDir, targetDir);
 
-  console.log(`  ✅ ${AGENTS.grok.name}: Installed plugin (skill-only, no hooks)`);
+  // Grok marketplace.json references ./skills/ — copy them
+  copyDir(path.join(root, 'skills'), path.join(targetDir, 'skills'));
+
+  console.log(`  ✅ ${AGENTS.grok.name}: Installed plugin + skills`);
   return true;
 }
 
@@ -349,7 +356,11 @@ async function installKimi(opts) {
   fs.mkdirSync(targetDir, { recursive: true });
   copyDir(pluginDir, targetDir);
 
-  console.log(`  ✅ ${AGENTS.kimi.name}: Installed plugin`);
+  // Kimi plugin.json references ./skills/ and ./AGENTS.md
+  copyDir(path.join(root, 'skills'), path.join(targetDir, 'skills'));
+  fs.copyFileSync(path.join(root, 'AGENTS.md'), path.join(targetDir, 'AGENTS.md'));
+
+  console.log(`  ✅ ${AGENTS.kimi.name}: Installed plugin + skills + AGENTS.md`);
   return true;
 }
 
@@ -366,12 +377,12 @@ async function installQoder(opts) {
   fs.mkdirSync(targetDir, { recursive: true });
   copyDir(pluginDir, targetDir);
 
-  // Also copy rules
-  const rulesDir = path.join(os.homedir(), '.qoder', 'rules');
-  fs.mkdirSync(rulesDir, { recursive: true });
-  fs.copyFileSync(path.join(root, '.qoder', 'rules', 'codecraft.md'), path.join(rulesDir, 'codecraft.md'));
+  // Qoder plugin.json references ./skills/, ./rules/, and ./hooks/
+  copyDir(path.join(root, 'skills'), path.join(targetDir, 'skills'));
+  copyDir(path.join(root, '.qoder', 'rules'), path.join(targetDir, '.qoder', 'rules'));
+  copyDir(path.join(root, 'hooks'), path.join(targetDir, 'hooks'));
 
-  console.log(`  ✅ ${AGENTS.qoder.name}: Installed plugin + rules`);
+  console.log(`  ✅ ${AGENTS.qoder.name}: Installed plugin + skills + rules + hooks`);
   return true;
 }
 

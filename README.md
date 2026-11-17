@@ -36,6 +36,35 @@ CodeCraft is a **compatibility-preserving derivative of [Ponytail](https://githu
 
 ## 🚀 Quick Start (30 seconds)
 
+### 🎯 Easiest Way — Single File Install (No Clone Needed!)
+
+**Just download and run one file:**
+
+```bash
+# Linux/macOS/Git Bash:
+curl -fsSL https://raw.githubusercontent.com/kunalkumar11/Codecraft/main/codecraft-install.js > codecraft-install.js && node codecraft-install.js
+
+# Windows PowerShell:
+irm https://raw.githubusercontent.com/kunalkumar11/Codecraft/main/codecraft-install.js | Out-File codecraft-install.js; node codecraft-install.js
+```
+
+**That's it.** The installer:
+1. Detects your AI agents (Claude Code, Codex, Grok, Cursor, OpenCode, Gemini, Kimi, Qoder, Hermes)
+2. Downloads CodeCraft from GitHub automatically
+3. Installs plugins, skills, hooks, and commands for each detected agent
+4. Tells you exactly what was installed where
+
+Then **restart your agent** and type:
+```
+/codecraft-help
+```
+
+> **Give this file to any AI agent** — just hand them `codecraft-install.js` and say "run this with Node.js". It works completely standalone.
+
+---
+
+### 📦 Traditional Way (Clone + npm)
+
 ### Prerequisites
 - **Node.js 22+** (CI target)
 - **Python 3.10+** (for Hermes adapter & Python checks)

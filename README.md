@@ -57,6 +57,24 @@ npm run setup
 npm test
 ```
 
+### ✅ Verified Working Install (Copy-Paste This)
+
+**Tested on Windows + Claude Code + Codex + Grok + Cursor:**
+
+```bash
+git clone https://github.com/kunalkumar11/Codecraft.git
+cd Codecraft
+npm install
+npm run setup
+```
+
+Then **restart your agent** and type:
+```
+/codecraft-help
+```
+
+**That's it.** The installer detects your agents (Claude Code, Codex, Grok, Cursor, etc.) and configures them automatically.
+
 ### 📖 Simple Install Guide
 > **New to this?** See [SIMPLE_INSTALL.md](SIMPLE_INSTALL.md) — step-by-step with screenshots, troubleshooting, and per-agent instructions.
 
@@ -82,9 +100,22 @@ npm test
 # Check what's installed where
 npm run doctor
 
-# Test a command in your agent
-/codecraft-help
+# Test commands in your agent (note: NO dash between codecraft and mode)
+/codecraft-help      # Show reference card
+/codecraft           # Show current mode
+/codecraft ultra     # Switch to ultra (questions requests)
+/codecraft lite      # Switch to lite (minimal)
+/codecraft full      # Switch to full (default)
+/codecraft off       # Disable
+
+# Skills (these USE dashes)
+/codecraft-review    # Review a diff
+/codecraft-audit     # Audit whole repo
+/codecraft-debt      # List shortcut: comments
+/codecraft-gain      # Show benchmark scoreboard
 ```
+
+> **Note:** Mode commands use space (`/codecraft ultra`), skill commands use dash (`/codecraft-audit`).
 
 ---
 

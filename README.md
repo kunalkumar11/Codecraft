@@ -29,6 +29,7 @@ CodeCraft is a **compatibility-preserving derivative of [Ponytail](https://githu
 | **Debt** | `/codecraft-debt` — harvest `shortcut:` comments into a tracked ledger |
 | **Gain** | `/codecraft-gain` — benchmark scoreboard: 53% less code, 45% fewer tokens, 26% less cost, 41% faster |
 | **Help** | `/codecraft-help` — this reference card |
+| **Python Audit** | `python tools/codecraft_python_audit.py` — AST + regex secret detection, risky patterns |
 
 **All `/ponytail*` commands still work.** Drop-in replacement.
 
@@ -185,6 +186,7 @@ commands/        # Claude Code .toml commands
 tests/           # Adapter, installer, behavior tests
 benchmarks/      # Agentic benchmark harnesses
 tools/           # Python source auditor (AST-based, no deps)
+    └── codecraft_python_audit.py  # Secret detection + risky pattern scanner
 ```
 
 The build script (`scripts/build-openclaw-skills.js`) auto-generates `.openclaw/skills/` from `skills/` — **CodeCraft skills are transformed Ponytail skills** (`PONYTAIL→CODECRAFT`, `Ponytail→CodeCraft`, `ponytail→codecraft`). Tests enforce they stay in sync.
@@ -206,6 +208,96 @@ node --test tests/openclaw-skills.test.js             # 36 tests
 # Full suite
 npm test                                              # 168 tests (2 pre-existing CSV flakes)
 ```
+
+---
+
+## 🔍 Python Audit Tool (Secret Detection + Risky Patterns)
+
+CodeCraft includes a standalone Python auditor (`tools/codecraft_python_audit.py`) that scans for:
+
+- **Hardcoded secrets** (API keys, tokens, passwords) in variable assignments
+- **Secret patterns** in strings/comments (AWS, GitHub, GitLab, Slack, Stripe, JWT, etc.)
+- **Risky patterns**: `eval`/`exec`, `os.system`, `subprocess shell=True`, `pickle` deserialization
+- **Broad exception handlers** that hide failures
+
+### Quick Start
+
+```bash
+# Scan a Python project (includes secret detection by default)
+python tools/codecraft_python_audit.py /path/to/project
+
+# Scan ALL config files (.env, .json, .yaml, .toml, .ini, .tf, .npmrc, etc.)
+python tools/codecraft_python_audit.py . --all-files
+
+# Scan git commit history for leaked secrets
+python tools/codecraft_python_audit.py . --git-history --git-depth 50
+
+# JSON output for CI/CD pipelines
+python tools/codecraft_python_audit.py . --all-files --format json --output audit.json
+
+# Disable secret scanning (risky patterns only)
+python tools/codecraft_python_audit.py . --no-secrets
+
+# Fail on medium+ findings (default: high)
+python tools/codecraft_python_audit.py . --fail-on medium
+```
+
+### Detected Secret Formats
+
+| Format | Example Pattern | Rule |
+|--------|-----------------|------|
+| AWS Access Key ID | `AKIAABCDEFGHIJKLMNOP` | `PYSEC006` / `SEC001` |
+| AWS Secret Access Key | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY` | `PYSEC006` / `SEC001` |
+| GitHub Token | `ghp_abcdefghijklmnopqrstuvwxyz1234567890` | `PYSEC006` / `SEC001` |
+| GitLab PAT | `glpat-abcdefghijklmnopqrst` | `PYSEC006` / `SEC001` |
+| Slack Token | `xoxb-1234567890-abcdefghijkl` | `PYSEC006` / `SEC001` |
+| Stripe Secret Key | `sk_test_YOUR_TEST_KEY_HERE` | `PYSEC006` / `SEC001` |
+| JWT Token | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` | `PYSEC006` / `SEC001` |
+| Generic 32-char Hex | `a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6` | `PYSEC006` / `SEC001` |
+| Generic 64-char Hex | `a1b2...` (64 chars) | `PYSEC006` / `SEC001` |
+
+### Supported File Types (with `--all-files`)
+
+| Extension | Description |
+|-----------|-------------|
+| `.py` | Python source (AST + token scan) |
+| `.env`, `.env.local`, `.env.production`, etc. | Environment files |
+| `.json`, `.yaml`, `.yml`, `.toml` | Config files |
+| `.ini`, `.cfg`, `.conf`, `.config`, `.properties` | INI-style configs |
+| `.tf`, `.tfvars` | Terraform |
+| `.npmrc`, `.yarnrc`, `.pypirc` | Package manager configs |
+| `.dockercfg`, `.dockerignore` | Docker configs |
+
+### Example Output
+
+```
+HIGH     PYSEC005 config.py:12:1 [security] hardcoded secret in variable 'api_key'; use environment variables or a secrets manager
+HIGH     PYSEC006 config.py:12:11 [security] potential AWS access key ID in source; use environment variables or a secrets manager
+HIGH     SEC001 .env:1:19 [security] potential AWS secret access key in .env:1; use environment variables or a secrets manager
+HIGH     SEC001 config.json:1:12 [security] potential GitHub token in config.json:1; use environment variables or a secrets manager
+MEDIUM   PYREL002 utils.py:45:5 [reliability] broad Exception handler may hide unrelated failures
+HIGH     PYSEC001 handler.py:8:12 [security] eval executes dynamically constructed Python code
+
+Scanned 15 Python file(s); 6 finding(s) (critical=0, high=4, medium=2, low=0, info=0).
+```
+
+### CI/CD Integration
+
+```yaml
+# GitHub Actions example
+- name: Run CodeCraft Python Audit
+  run: |
+    python tools/codecraft_python_audit.py . --all-files --format json --output audit.json
+    # Fail on high+ findings
+    python tools/codecraft_python_audit.py . --all-files --fail-on high
+```
+
+### Smart False Positive Filtering
+
+- **Git commit SHAs** (40-char hex) are ignored via word boundaries
+- **Test/fake values** skipped: `test_key`, `your_token`, `placeholder`, `sk_test_*`, `pk_test_*`, `change_me`, `xxx`, `yyy`, `zzz`
+- **AWS secrets** require `+/=` chars to distinguish from SHAs
+- **High-entropy strings** only flagged near secret context keywords (`key`, `secret`, `token`, `password`, `api`, etc.)
 
 ---
 

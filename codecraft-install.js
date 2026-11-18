@@ -122,7 +122,7 @@ async function downloadRepo() {
   const zipUrl = `https://codeload.github.com/${REPO}/zip/refs/heads/${BRANCH}`;
   const zipPath = path.join(tmpDir, 'repo.zip');
 
-  console.log(`📥 Downloading CodeCraft from GitHub...`);
+  console.log(`Downloading CodeCraft from GitHub...`);
   await downloadFile(zipUrl, zipPath);
 
   // Extract using node's built-in or system unzip
@@ -156,7 +156,7 @@ async function installClaude(opts) {
   const targetDir = path.join(os.homedir(), '.claude', 'plugins', 'codecraft');
 
   if (dryRun) {
-    console.log(`  📋 ${AGENTS.claude.name}: Would copy plugin to ${targetDir}`);
+    console.log(`  -> ${AGENTS.claude.name}: Would copy plugin to ${targetDir}`);
     return 'skipped';
   }
 
@@ -174,7 +174,7 @@ async function installClaude(opts) {
     }
   }
 
-  console.log(`  ✅ ${AGENTS.claude.name}: Installed plugin + commands`);
+  console.log(`  [OK] ${AGENTS.claude.name}: Installed plugin + commands`);
   return true;
 }
 
@@ -184,7 +184,7 @@ async function installCodex(opts) {
   const targetDir = path.join(os.homedir(), '.codex', 'plugins', 'codecraft');
 
   if (dryRun) {
-    console.log(`  📋 ${AGENTS.codex.name}: Would copy plugin to ${targetDir}`);
+    console.log(`  -> ${AGENTS.codex.name}: Would copy plugin to ${targetDir}`);
     return 'skipped';
   }
 
@@ -193,7 +193,7 @@ async function installCodex(opts) {
   copyDir(path.join(root, 'skills'), path.join(targetDir, 'skills'));
   copyDir(path.join(root, 'hooks'), path.join(targetDir, 'hooks'));
 
-  console.log(`  ✅ ${AGENTS.codex.name}: Installed plugin + skills + hooks`);
+  console.log(`  [OK] ${AGENTS.codex.name}: Installed plugin + skills + hooks`);
   return true;
 }
 
@@ -203,7 +203,7 @@ async function installGrok(opts) {
   const targetDir = path.join(os.homedir(), '.grok', 'plugins', 'codecraft');
 
   if (dryRun) {
-    console.log(`  📋 ${AGENTS.grok.name}: Would copy plugin to ${targetDir}`);
+    console.log(`  -> ${AGENTS.grok.name}: Would copy plugin to ${targetDir}`);
     return 'skipped';
   }
 
@@ -211,7 +211,7 @@ async function installGrok(opts) {
   copyDir(pluginDir, targetDir);
   copyDir(path.join(root, 'skills'), path.join(targetDir, 'skills'));
 
-  console.log(`  ✅ ${AGENTS.grok.name}: Installed plugin + skills`);
+  console.log(`  [OK] ${AGENTS.grok.name}: Installed plugin + skills`);
   return true;
 }
 
@@ -220,7 +220,7 @@ async function installCursor(opts) {
 
   if (dryRun) {
     const target = project ? 'project .cursor/hooks.json' : 'global ~/.cursor/hooks.json';
-    console.log(`  📋 ${AGENTS.cursor.name}: Would run cursor-hooks.js install (${target})`);
+    console.log(`  -> ${AGENTS.cursor.name}: Would run cursor-hooks.js install (${target})`);
     return 'skipped';
   }
 
@@ -236,7 +236,7 @@ async function installCursor(opts) {
   fs.mkdirSync(rulesDir, { recursive: true });
   fs.copyFileSync(path.join(root, '.cursor', 'rules', 'codecraft.mdc'), path.join(rulesDir, 'codecraft.mdc'));
 
-  console.log(`  ✅ ${AGENTS.cursor.name}: Installed hooks${project ? ' (project)' : ' (global)'} + rules`);
+  console.log(`  [OK] ${AGENTS.cursor.name}: Installed hooks${project ? ' (project)' : ' (global)'} + rules`);
   return true;
 }
 
@@ -246,14 +246,14 @@ async function installOpenCode(opts) {
   const targetDir = path.join(os.homedir(), '.config', 'opencode', 'plugins', 'codecraft');
 
   if (dryRun) {
-    console.log(`  📋 ${AGENTS.opencode.name}: Would copy plugin to ${targetDir}`);
+    console.log(`  -> ${AGENTS.opencode.name}: Would copy plugin to ${targetDir}`);
     return 'skipped';
   }
 
   fs.mkdirSync(targetDir, { recursive: true });
   copyDir(pluginDir, targetDir);
 
-  console.log(`  ✅ ${AGENTS.opencode.name}: Installed plugin (V1+V2 compatible)`);
+  console.log(`  [OK] ${AGENTS.opencode.name}: Installed plugin (V1+V2 compatible)`);
   return true;
 }
 
@@ -262,7 +262,7 @@ async function installGemini(opts) {
   const targetDir = path.join(os.homedir(), '.config', 'gemini', 'extensions', 'codecraft');
 
   if (dryRun) {
-    console.log(`  📋 ${AGENTS.gemini.name}: Would install extension to ${targetDir}`);
+    console.log(`  -> ${AGENTS.gemini.name}: Would install extension to ${targetDir}`);
     return 'skipped';
   }
 
@@ -271,7 +271,7 @@ async function installGemini(opts) {
   copyDir(path.join(root, 'commands'), path.join(targetDir, 'commands'));
   fs.copyFileSync(path.join(root, 'AGENTS.md'), path.join(targetDir, 'AGENTS.md'));
 
-  console.log(`  ✅ ${AGENTS.gemini.name}: Installed extension`);
+  console.log(`  [OK] ${AGENTS.gemini.name}: Installed extension`);
   return true;
 }
 
@@ -281,7 +281,7 @@ async function installKimi(opts) {
   const targetDir = path.join(os.homedir(), '.kimi', 'plugins', 'codecraft');
 
   if (dryRun) {
-    console.log(`  📋 ${AGENTS.kimi.name}: Would copy plugin to ${targetDir}`);
+    console.log(`  -> ${AGENTS.kimi.name}: Would copy plugin to ${targetDir}`);
     return 'skipped';
   }
 
@@ -290,7 +290,7 @@ async function installKimi(opts) {
   copyDir(path.join(root, 'skills'), path.join(targetDir, 'skills'));
   fs.copyFileSync(path.join(root, 'AGENTS.md'), path.join(targetDir, 'AGENTS.md'));
 
-  console.log(`  ✅ ${AGENTS.kimi.name}: Installed plugin + skills + AGENTS.md`);
+  console.log(`  [OK] ${AGENTS.kimi.name}: Installed plugin + skills + AGENTS.md`);
   return true;
 }
 
@@ -300,7 +300,7 @@ async function installQoder(opts) {
   const targetDir = path.join(os.homedir(), '.qoder', 'plugins', 'codecraft');
 
   if (dryRun) {
-    console.log(`  📋 ${AGENTS.qoder.name}: Would copy plugin to ${targetDir}`);
+    console.log(`  -> ${AGENTS.qoder.name}: Would copy plugin to ${targetDir}`);
     return 'skipped';
   }
 
@@ -310,7 +310,7 @@ async function installQoder(opts) {
   copyDir(path.join(root, '.qoder', 'rules'), path.join(targetDir, '.qoder', 'rules'));
   copyDir(path.join(root, 'hooks'), path.join(targetDir, 'hooks'));
 
-  console.log(`  ✅ ${AGENTS.qoder.name}: Installed plugin + skills + rules + hooks`);
+  console.log(`  [OK] ${AGENTS.qoder.name}: Installed plugin + skills + rules + hooks`);
   return true;
 }
 
@@ -319,14 +319,14 @@ async function installHermes(opts) {
   const targetDir = path.join(os.homedir(), '.hermes', 'plugins', 'codecraft');
 
   if (dryRun) {
-    console.log(`  📋 ${AGENTS.hermes.name}: Would copy plugin to ${targetDir}`);
+    console.log(`  -> ${AGENTS.hermes.name}: Would copy plugin to ${targetDir}`);
     return 'skipped';
   }
 
   fs.mkdirSync(targetDir, { recursive: true });
   copyDir(root, targetDir, ['node_modules', '.git', 'benchmarks', 'examples', 'assets', 'tests', 'scripts', 'docs']);
 
-  console.log(`  ✅ ${AGENTS.hermes.name}: Installed plugin (full repo copy)`);
+  console.log(`  [OK] ${AGENTS.hermes.name}: Installed plugin (full repo copy)`);
   return true;
 }
 
@@ -366,12 +366,12 @@ Examples:
     return;
   }
 
-  console.log(`\n🔧 CodeCraft Single-File Installer v${VERSION}\n`);
+  console.log(`\n=== CodeCraft Single-File Installer v${VERSION}\n`);
 
   // Download repo if not running from a local checkout
   let root = __dirname;
   if (!fs.existsSync(path.join(root, '.claude-plugin'))) {
-    console.log('📦 Not running from a local checkout — downloading CodeCraft from GitHub...');
+    console.log('-> Not running from a local checkout -> downloading CodeCraft from GitHub...');
     root = await downloadRepo();
     console.log(`   Downloaded to: ${root}\n`);
   }
@@ -381,7 +381,7 @@ Examples:
   for (const [key, agent] of Object.entries(AGENTS)) {
     const available = agent.detect();
     detected[key] = { ...agent, available };
-    const status = available ? '✅ detected' : '❌ not found';
+    const status = available ? '[OK] detected' : '[--] not found';
     console.log(`  ${agent.name}: ${status}`);
   }
 
@@ -396,11 +396,11 @@ Examples:
     : Object.keys(detected).filter(k => detected[k].available);
 
   if (targets.length === 0) {
-    console.log('\n❌ No agents selected or detected. Use --agent to specify manually.\n');
+    console.log('\n[--] No agents selected or detected. Use --agent to specify manually.\n');
     process.exit(1);
   }
 
-  console.log(`\n📦 Installing for: ${targets.map(t => AGENTS[t].name).join(', ')}`);
+  console.log(`\n-> Installing for: ${targets.map(t => AGENTS[t].name).join(', ')}`);
   if (opts.dryRun) console.log('   (dry run - no changes will be made)\n');
 
   const results = { success: [], failed: [], skipped: [] };
@@ -408,7 +408,7 @@ Examples:
   for (const key of targets) {
     const agent = detected[key];
     if (!agent.available && !opts.force) {
-      console.log(`  ⏭️  ${agent.name}: not detected (use --force to install anyway)`);
+      console.log(`  [!]  ${agent.name}: not detected (use --force to install anyway)`);
       results.skipped.push(key);
       continue;
     }
@@ -423,27 +423,27 @@ Examples:
         results.failed.push(key);
       }
     } catch (e) {
-      console.log(`  ❌ ${agent.name}: ${e.message}`);
+      console.log(`  [X] ${agent.name}: ${e.message}`);
       results.failed.push(key);
     }
   }
 
   // Summary
-  console.log('\n📋 Summary:');
-  if (results.success.length) console.log(`  ✅ Installed: ${results.success.map(k => AGENTS[k].name).join(', ')}`);
-  if (results.skipped.length) console.log(`  ⏭️  Skipped: ${results.skipped.map(k => AGENTS[k].name).join(', ')}`);
-  if (results.failed.length) console.log(`  ❌ Failed: ${results.failed.map(k => AGENTS[k].name).join(', ')}`);
+  console.log('\n=== Summary:');
+  if (results.success.length) console.log(`  [OK] Installed: ${results.success.map(k => AGENTS[k].name).join(', ')}`);
+  if (results.skipped.length) console.log(`  [!]  Skipped: ${results.skipped.map(k => AGENTS[k].name).join(', ')}`);
+  if (results.failed.length) console.log(`  [X] Failed: ${results.failed.map(k => AGENTS[k].name).join(', ')}`);
 
   // Generic AGENTS.md copy instruction for rule-only agents
   const ruleOnlyAgents = ['windsurf', 'cline', 'aider', 'kiro', 'zed', 'codewhale', 'copilot', 'junie', 'amp', 'jules'];
-  console.log('\n📝 For other agents (Windsurf, Cline, Aider, Kiro, Zed, CodeWhale, Copilot, Junie, Amp, Jules):');
+  console.log('\n-> For other agents (Windsurf, Cline, Aider, Kiro, Zed, CodeWhale, Copilot, Junie, Amp, Jules):');
   console.log(`   Copy AGENTS.md to your project root or global config:`);
   console.log(`   cp ${path.join(root, 'AGENTS.md')} <project>/AGENTS.md`);
 
   if (opts.dryRun) {
-    console.log('\n💡 Run without --dry-run to apply changes.\n');
+    console.log('\n-> Run without --dry-run to apply changes.\n');
   } else {
-    console.log('\n✨ Done! Restart your agent to pick up the changes.\n');
+    console.log('\n[OK] Done! Restart your agent to pick up the changes.\n');
   }
 
   if (results.failed.length) process.exit(1);

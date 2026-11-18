@@ -13,7 +13,7 @@
 curl -fsSL https://raw.githubusercontent.com/kunalkumar11/Codecraft/main/codecraft-install.js > codecraft-install.js && node codecraft-install.js
 
 # Windows PowerShell:
-irm https://raw.githubusercontent.com/kunalkumar11/Codecraft/main/codecraft-install.js | Out-File codecraft-install.js; node codecraft-install.js
+curl -fsSL https://raw.githubusercontent.com/kunalkumar11/Codecraft/main/codecraft-install.js -o codecraft-install.js; node codecraft-install.js
 ```
 
 **That's it.** The installer:

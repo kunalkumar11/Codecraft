@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// ponytail — imports past Claude Code sessions into the band's task ledger, so the board can
+// codecraft — imports past Claude Code sessions into the band's task ledger, so the board can
 // compare them: cost, agent time, tokens, turns, name and model. Started in the background by
-// `/ponytail band import`; also runs by hand. Sessions already in the ledger are left alone.
+// `/codecraft band import`; also runs by hand. Sessions already in the ledger are left alone.
 
 const fs = require('fs');
 const os = require('os');
@@ -270,7 +270,7 @@ function run() {
 
 if (require.main === module) {
   const { sessions, added } = run();
-  process.stdout.write(`ponytail band import: ${sessions} past sessions found, ${added} new rows in the board.\n`);
+  process.stdout.write(`codecraft band import: ${sessions} past sessions found, ${added} new rows in the board.\n`);
 }
 
 module.exports = { CSV_HEADER, PRICES, replyCost, sessionStats, csvRow, mergeRows, readRecords, run };

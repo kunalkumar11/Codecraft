@@ -12,18 +12,18 @@ const {
   isDeactivationCommand,
   writeDefaultMode,
 } = require("../hooks/codecraft-config.js");
-const { getPonytailInstructions, filterSkillBodyForMode } = require("../hooks/codecraft-instructions.js");
+const { getCodecraftInstructions, filterSkillBodyForMode } = require("../hooks/codecraft-instructions.js");
 
 export { filterSkillBodyForMode };
 export const readDefaultMode = getDefaultMode;
 export const readQuietStartup = getQuietStartup;
 
 const RUNTIME_MODE_LIST = RUNTIME_MODES.join("|");
-const PONYTAIL_COMMAND_DESCRIPTION = `CodeCraft mode: ${RUNTIME_MODE_LIST}. Commands: status, default <mode>`;
+const CODECRAFT_COMMAND_DESCRIPTION = `CodeCraft mode: ${RUNTIME_MODE_LIST}. Commands: status, default <mode>`;
 
 // Every item is a complete command: pi submits on Enter, so a bare "default" would run without a mode.
 // Values only: per-level descriptions would be a second copy of the Levels table in SKILL.md.
-export function completePonytailArgs(prefix) {
+export function completeCodecraftArgs(prefix) {
   const typed = String(prefix || "").trimStart();
   const values = [...RUNTIME_MODES, "status", ...RUNTIME_MODES.map((m) => `default ${m}`)].filter((v) => v.startsWith(typed));
   return values.length ? values.map((value) => ({ value, label: value })) : null;
@@ -44,7 +44,7 @@ export function resolveSessionMode(entries, fallbackMode = DEFAULT_MODE) {
   return fallback;
 }
 
-export function parsePonytailCommand(text, defaultMode = DEFAULT_MODE, currentMode = null) {
+export function parseCodecraftCommand(text, defaultMode = DEFAULT_MODE, currentMode = null) {
   const fallback = normalizePersistedMode(defaultMode) || DEFAULT_MODE;
   const normalizedText = String(text || "").trim().toLowerCase();
 
@@ -125,7 +125,7 @@ export default function codecraftExtension(pi) {
   };
 
   const handleModeCommand = async (args, ctx) => {
-      const parsed = parsePonytailCommand(args, configuredDefaultMode, currentMode);
+      const parsed = parseCodecraftCommand(args, configuredDefaultMode, currentMode);
 
       if (parsed.type === "status") {
         ctx?.ui?.notify?.(`CodeCraft: current ${currentMode} • default ${configuredDefaultMode}`, "info");
@@ -158,8 +158,8 @@ export default function codecraftExtension(pi) {
 
   for (const name of ["codecraft", "codecraft"]) {
     pi.registerCommand(name, {
-      description: PONYTAIL_COMMAND_DESCRIPTION,
-      getArgumentCompletions: (prefix) => completePonytailArgs(prefix),
+      description: CODECRAFT_COMMAND_DESCRIPTION,
+      getArgumentCompletions: (prefix) => completeCodecraftArgs(prefix),
       handler: handleModeCommand,
     });
   }
@@ -245,7 +245,7 @@ export default function codecraftExtension(pi) {
       if (event?.systemPromptOptions?.sections) delete event.systemPromptOptions.sections.codecraft;
       return;
     }
-    const instructions = getPonytailInstructions(currentMode);
+    const instructions = getCodecraftInstructions(currentMode);
     // Prefer structured sections so Pi can keep the cached prefix when other
     // extensions change their own section (#953). Fall back to replacement
     // for older Pi versions without systemPromptOptions.sections.

@@ -1,12 +1,12 @@
-# Caveman vs Ponytail — 2026-06-12
+# Caveman vs CodeCraft — 2026-06-12
 
 5 coding tasks × fresh subagent per config, same model. Tokens = agent total
 (includes thinking). Code lines = fenced blocks in the deliverable, approx.
 n=1 per cell — durations carry noise.
 
-## Ponytail v1 (before this benchmark)
+## CodeCraft v1 (before this benchmark)
 
-| Task | Baseline | Caveman | Ponytail v1 |
+| Task | Baseline | Caveman | CodeCraft v1 |
 |---|---|---|---|
 | email | 31,971 tok · 104s · ~34 loc | 26,464 · 20s · ~25 | 27,582 · 32s · 6 |
 | debounce | 23,966 · 25s · ~38 | 26,496 · 19s · ~36 | 27,812 · 33s · 6 |
@@ -17,20 +17,20 @@ n=1 per cell — durations carry noise.
 
 ### v1 findings
 
-1. Code minimalism: ponytail dominated (2.2× fewer lines than caveman, 5.5× fewer than baseline).
-2. Total tokens: caveman won by ~4% — ponytail wrote minimal code, then long
+1. Code minimalism: codecraft dominated (2.2× fewer lines than caveman, 5.5× fewer than baseline).
+2. Total tokens: caveman won by ~4% — codecraft wrote minimal code, then long
    "skipped on purpose" essays. Prose ate the code savings.
-3. Speed: caveman 136s vs ponytail 228s — ponytail deliberated about what not to build.
+3. Speed: caveman 136s vs codecraft 228s — codecraft deliberated about what not to build.
 4. Floor effect: on already-minimal tasks (csv-sum) both skills pay ~3k tokens
    skill-read tax over baseline.
 
-## Ponytail v2 (after fixes)
+## CodeCraft v2 (after fixes)
 
 v2 changes: Output cap (code + ≤3 short lines, "if the explanation is longer
 than the code, delete the explanation"), ladder-is-a-reflex clause
 (anti-deliberation), ship-and-question rule (never stall on "do you need X?").
 
-| Task | Ponytail v2 | Δ vs v1 | Δ vs caveman |
+| Task | CodeCraft v2 | Δ vs v1 | Δ vs caveman |
 |---|---|---|---|
 | email | 26,705 · 21s · 5 loc | −877 tok · −11s | +241 tok · +1s |
 | debounce | 27,185 · 25s · 6 | −627 · −8s | +689 · +6s |
@@ -39,13 +39,13 @@ than the code, delete the explanation"), ladder-is-a-reflex clause
 | rate-limit | 28,858 · 48s · 17 | −3,721 · −45s | −3,874 · −15s |
 | **Total** | **136,624 · 158s · 47** | **−6,964 (−4.8%) · −70s (−31%)** | **−1,786 (−1.3%) · +22s** |
 
-## Ponytail v3 (skill file compressed)
+## CodeCraft v3 (skill file compressed)
 
 v3 change: SKILL.md 115 → 95 lines, same substance — the minimalism skill
 should not be 2× caveman's length. Cuts read cost per invocation and
 injection cost per session.
 
-| Task | Ponytail v3 | Δ vs v2 | Δ vs caveman |
+| Task | CodeCraft v3 | Δ vs v2 | Δ vs caveman |
 |---|---|---|---|
 | email | 26,573 · 19s · 5 loc | −132 · −2s | +109 · −1s |
 | debounce | 26,745 · 22s · 5 | −440 · −3s | +249 · +3s |

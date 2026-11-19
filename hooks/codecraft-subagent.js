@@ -10,7 +10,7 @@
 // regex is unanchored and case-insensitive — "explore|general" matches either,
 // "^general$" is exact. Unset means inject into every subagent, as before.
 
-const { getPonytailInstructions } = require('./codecraft-instructions');
+const { getCodecraftInstructions } = require('./codecraft-instructions');
 const { readMode, writeHookOutput } = require('./codecraft-runtime');
 const vm = require('vm');
 
@@ -23,7 +23,7 @@ if (!mode || mode === 'off') {
 
 function inject() {
   try {
-    writeHookOutput('SubagentStart', mode, getPonytailInstructions(mode));
+    writeHookOutput('SubagentStart', mode, getCodecraftInstructions(mode));
   } catch (e) {
     // Silent fail — a stdout error at hook exit must not surface as a hook failure.
   }

@@ -6,28 +6,28 @@ import test from "node:test";
 
 import {
   filterSkillBodyForMode,
-  parsePonytailCommand,
+  parseCodecraftCommand,
   readDefaultMode,
   readQuietStartup,
   resolveSessionMode,
   writeDefaultMode,
 } from "../index.js";
 
-test("parsePonytailCommand falls back to full when invoked bare and default is off", () => {
-  assert.deepEqual(parsePonytailCommand("", "off"), { type: "set-mode", mode: "full" });
-  // #639: when ponytail is already on, a bare command reports instead of resetting the level.
-  assert.deepEqual(parsePonytailCommand("", "full", "ultra"), { type: "status" });
-  assert.deepEqual(parsePonytailCommand("", "full", "off"), { type: "set-mode", mode: "full" });
+test("parseCodecraftCommand falls back to full when invoked bare and default is off", () => {
+  assert.deepEqual(parseCodecraftCommand("", "off"), { type: "set-mode", mode: "full" });
+  // #639: when codecraft is already on, a bare command reports instead of resetting the level.
+  assert.deepEqual(parseCodecraftCommand("", "full", "ultra"), { type: "status" });
+  assert.deepEqual(parseCodecraftCommand("", "full", "off"), { type: "set-mode", mode: "full" });
 });
 
-test("parsePonytailCommand parses modes, status, and default subcommand", () => {
-  assert.deepEqual(parsePonytailCommand("ultra", "full"), { type: "set-mode", mode: "ultra" });
-  assert.deepEqual(parsePonytailCommand("status", "full"), { type: "status" });
-  assert.deepEqual(parsePonytailCommand("default lite", "full"), { type: "set-default", mode: "lite" });
+test("parseCodecraftCommand parses modes, status, and default subcommand", () => {
+  assert.deepEqual(parseCodecraftCommand("ultra", "full"), { type: "set-mode", mode: "ultra" });
+  assert.deepEqual(parseCodecraftCommand("status", "full"), { type: "status" });
+  assert.deepEqual(parseCodecraftCommand("default lite", "full"), { type: "set-default", mode: "lite" });
 });
 
-test("parsePonytailCommand rejects review as a default (session-only mode, #377)", () => {
-  assert.deepEqual(parsePonytailCommand("default review", "full"), { type: "invalid", reason: "invalid-default-mode" });
+test("parseCodecraftCommand rejects review as a default (session-only mode, #377)", () => {
+  assert.deepEqual(parseCodecraftCommand("default review", "full"), { type: "invalid", reason: "invalid-default-mode" });
 });
 
 test("resolveSessionMode still honors review as a session mode (not a default)", () => {
@@ -75,7 +75,7 @@ test("readDefaultMode and writeDefaultMode use XDG config path", () => {
 });
 
 test("readDefaultMode trims and normalizes whitespace in env and config values", () => {
-  const tempDir = mkdtempSync(join(tmpdir(), "ponytail-default-normalize-"));
+  const tempDir = mkdtempSync(join(tmpdir(), "codecraft-default-normalize-"));
   const previousXdg = process.env.XDG_CONFIG_HOME;
   const previousDefault = process.env.CODECRAFT_DEFAULT_MODE;
   const configDir = join(tempDir, "codecraft");
@@ -101,7 +101,7 @@ test("readDefaultMode trims and normalizes whitespace in env and config values",
 });
 
 test("readQuietStartup resolves env var, config file, and default in that order", () => {
-  const tempDir = mkdtempSync(join(tmpdir(), "ponytail-quiet-"));
+  const tempDir = mkdtempSync(join(tmpdir(), "codecraft-quiet-"));
   const previousXdg = process.env.XDG_CONFIG_HOME;
   const previousEnv = process.env.CODECRAFT_QUIET_STARTUP;
   const configDir = join(tempDir, "codecraft");
@@ -135,7 +135,7 @@ test("readQuietStartup resolves env var, config file, and default in that order"
 test("filterSkillBodyForMode keeps only requested intensity examples and rows", () => {
   // Examples are quoted in the real SKILL.md (`- lite: "..."`) — match that
   // shape here too; see the next test for why the quote is load-bearing.
-  const body = `---\nname: ponytail\n---\n| **lite** | keep lite |\n| **full** | keep full |\n| **ultra** | keep ultra |\n- lite: "Lite example"\n- full: "Full example"\n- ultra: "Ultra example"\nOther line`;
+  const body = `---\nname: codecraft\n---\n| **lite** | keep lite |\n| **full** | keep full |\n| **ultra** | keep ultra |\n- lite: "Lite example"\n- full: "Full example"\n- ultra: "Ultra example"\nOther line`;
 
   const filtered = filterSkillBodyForMode(body, "ultra");
 

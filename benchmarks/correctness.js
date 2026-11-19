@@ -18,7 +18,7 @@ const os = require('os');
 const path = require('path');
 
 function correctnessTimeoutMs() {
-  const value = Number.parseInt(process.env.PONYTAIL_CORRECTNESS_TIMEOUT_MS || '', 10);
+  const value = Number.parseInt(process.env.CODECRAFT_CORRECTNESS_TIMEOUT_MS || '', 10);
   return Number.isFinite(value) && value > 0 ? value : 30_000;
 }
 
@@ -26,7 +26,7 @@ function correctnessTimeoutMs() {
 function extractBlocks(text) {
   text = String(text || '');
   const matches = [...text.matchAll(/```(\w*)\r?\n([\s\S]*?)```/g)];
-  // ponytail: terse models often answer with bare, unfenced code. Treat the whole
+  // codecraft: terse models often answer with bare, unfenced code. Treat the whole
   // response as one block so the gate scores the code instead of reporting "no block".
   if (matches.length === 0 && text.trim()) return [{ lang: '', code: text }];
   return matches.map((m) => ({ lang: (m[1] || '').toLowerCase(), code: m[2] }));

@@ -461,11 +461,11 @@ const APP = `(function () {
   function download(blob, name) { var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click() }
   // The saved card carries its own copy of the logo, so it stands alone.
   function cardText() { var c = byId('card').cloneNode(true); c.querySelector('defs').append(byId('codecraft-mark').cloneNode(true)); return new XMLSerializer().serializeToString(c) }
-  function saveSvg() { download(new Blob([cardText()], { type: 'image/svg+xml' }), 'ponytail-card.svg') }
+  function saveSvg() { download(new Blob([cardText()], { type: 'image/svg+xml' }), 'codecraft-card.svg') }
   function savePng() {
     var img = new Image()
     img.onload = function () {
-      try { var c = document.createElement('canvas'); c.width = 1200; c.height = 630; c.getContext('2d').drawImage(img, 0, 0); c.toBlob(function (b) { b ? download(b, 'ponytail-card.png') : saveSvg() }) } catch (e) { saveSvg() }
+      try { var c = document.createElement('canvas'); c.width = 1200; c.height = 630; c.getContext('2d').drawImage(img, 0, 0); c.toBlob(function (b) { b ? download(b, 'codecraft-card.png') : saveSvg() }) } catch (e) { saveSvg() }
     }
     img.onerror = saveSvg
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(cardText())
@@ -492,12 +492,12 @@ const APP = `(function () {
     b.title = 'Theme: ' + choice
   }
   var saved = 'dark'
-  try { saved = localStorage.getItem('ponytail-board-theme') || 'dark' } catch (e) {}
+  try { saved = localStorage.getItem('codecraft-board-theme') || 'dark' } catch (e) {}
   applyTheme(THEMES.indexOf(saved) >= 0 ? saved : 'dark')
   byId('theme').addEventListener('click', function () {
     var next = THEMES[(THEMES.indexOf(byId('theme').getAttribute('data-choice')) + 1) % THEMES.length]
     applyTheme(next)
-    try { localStorage.setItem('ponytail-board-theme', next) } catch (e) {}
+    try { localStorage.setItem('codecraft-board-theme', next) } catch (e) {}
   })
 
   render()

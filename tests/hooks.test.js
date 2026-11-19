@@ -12,7 +12,7 @@ const root = path.join(__dirname, '..');
 // paths pass, paths carrying shell metacharacters are rejected so they never get
 // embedded in a shell command.
 const { DEFAULT_MODE, getDefaultMode, isShellSafe, writeDefaultMode } = require('../hooks/codecraft-config');
-const { getPonytailInstructions } = require('../hooks/codecraft-instructions');
+const { getCodecraftInstructions } = require('../hooks/codecraft-instructions');
 assert.equal(isShellSafe('C:\\Users\\x\\.claude\\plugins\\codecraft\\hooks\\codecraft-statusline.ps1'), true);
 assert.equal(isShellSafe('/home/u/.claude/plugins/codecraft/hooks/codecraft-statusline.sh'), true);
 assert.equal(isShellSafe('/tmp/a"&calc.exe&"/x.sh'), false);
@@ -194,7 +194,7 @@ assert.match(
 );
 // The switch carries the new level's ruleset: the SessionStart one is filtered
 // to the start level, and `$codecraft lite` does not load the skill body.
-assert.ok(output.hookSpecificOutput.additionalContext.endsWith(getPonytailInstructions('lite')));
+assert.ok(output.hookSpecificOutput.additionalContext.endsWith(getCodecraftInstructions('lite')));
 
 for (const [prompt, mode] of [
   ['$codecraft full', 'full'],
@@ -206,7 +206,7 @@ for (const [prompt, mode] of [
   assert.equal(fs.readFileSync(codexState, 'utf8'), mode);
   output = JSON.parse(result.stdout);
   assert.equal(output.hookSpecificOutput.hookEventName, 'UserPromptSubmit');
-  assert.ok(output.hookSpecificOutput.additionalContext.endsWith(getPonytailInstructions(mode)));
+  assert.ok(output.hookSpecificOutput.additionalContext.endsWith(getCodecraftInstructions(mode)));
 }
 
 const codecraftHome = path.join(temp, 'codecraft-home');

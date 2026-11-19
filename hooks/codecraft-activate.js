@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { getDefaultMode, getClaudeDir, isShellSafe } = require('./codecraft-config');
-const { getPonytailInstructions } = require('./codecraft-instructions');
+const { getCodecraftInstructions } = require('./codecraft-instructions');
 const {
   clearMode,
   cursorRuleNotice,
@@ -58,7 +58,7 @@ function activate(mode) {
   }
 
   // 2. Emit the codecraft ruleset, filtered to the active intensity level.
-  let output = getPonytailInstructions(mode);
+  let output = getCodecraftInstructions(mode);
 
   // 2b. Codebase map: what already exists, so "reuse first" costs no search. Fail open: the map
   // gets 3 s, well inside the 15 s hook limit, so a stalled map never costs the rules (#1079, #1157).

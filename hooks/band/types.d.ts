@@ -30,6 +30,6 @@ export type Band = {
 
 declare module 'claude-code' {
   interface PluginState {
-    ponytail: { band: Band }
+    codecraft: { band: Band }
   }
 }

@@ -2,7 +2,7 @@
 
 **Task:** "Add a modal dialog for the delete confirmation."
 
-## Without Ponytail
+## Without CodeCraft
 
 ```bash
 npm install @radix-ui/react-dialog
@@ -41,10 +41,10 @@ export function DeleteModal({ onConfirm, onCancel }) {
 
 A dependency, a portal, an overlay, a root, a trigger, a content wrapper, to show a box with two buttons.
 
-## With Ponytail
+## With CodeCraft
 
 ```html
-<!-- ponytail: browser has one, with focus trapping and backdrop built in -->
+<!-- codecraft: browser has one, with focus trapping and backdrop built in -->
 <dialog id="confirm-delete">
   <p>This action cannot be undone.</p>
   <button id="cancel">Cancel</button>

@@ -201,7 +201,6 @@ Install Node.js and make sure it's in your **non-interactive shell PATH** (not j
 | `/codecraft-debt` | List all `shortcut:` comments with upgrade paths |
 | `/codecraft-gain` | Show benchmark scoreboard |
 
-**All `/ponytail*` commands also work** (backward compatibility).
 
 ---
 
@@ -224,7 +223,7 @@ Use it on:
 ## 🆘 Still Stuck?
 
 1. Run `npm run doctor` — shows exactly what's installed where
-2. Check the agent's plugin/settings UI — look for "CodeCraft" or "ponytail"
+2. Check the agent's plugin/settings UI — look for "CodeCraft"
 3. Restart the agent completely (close and reopen)
 4. Open an issue at [github.com/kunalkumar11/Codecraft/issues](https://github.com/kunalkumar11/Codecraft/issues)
 

@@ -26,10 +26,9 @@ const skillsDir = path.join(root, '.openclaw', 'skills');
 
 const version = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).version;
 
-// Publish only the legacy upstream slugs. CodeCraft aliases are generated for
-// local installs, but this checkout does not own the upstream ClawHub identity.
+// Publish CodeCraft skills to ClawHub.
 const slugs = fs.readdirSync(skillsDir, { withFileTypes: true })
-  .filter((e) => e.isDirectory() && e.name.startsWith('ponytail') && fs.existsSync(path.join(skillsDir, e.name, 'SKILL.md')))
+  .filter((e) => e.isDirectory() && e.name.startsWith('codecraft') && fs.existsSync(path.join(skillsDir, e.name, 'SKILL.md')))
   .map((e) => e.name)
   .sort();
 

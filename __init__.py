@@ -1,4 +1,4 @@
-"""Hermes adapter for the CodeCraft Ponytail-compatible plugin."""
+"""Hermes adapter for the CodeCraft plugin."""
 
 from __future__ import annotations
 
@@ -11,11 +11,6 @@ from typing import Any, Callable
 DEFAULT_MODE = "full"
 RUNTIME_MODES = {"off", "lite", "full", "ultra"}
 SKILL_COMMANDS = {
-    "ponytail-review": "Review the current diff or provided target: bugs, security, load, missing tests, speed, and what to cut.",
-    "ponytail-audit": "Audit the whole repo: bugs, security, load, missing tests, speed, and what to cut.",
-    "ponytail-debt": "List every deliberate `shortcut:` comment and its upgrade path.",
-    "ponytail-gain": "Show the measured-impact scoreboard (less code, less cost, more speed).",
-    "ponytail-help": "Show the CodeCraft command reference.",
     "codecraft-review": "Review the current diff or provided target: bugs, security, load, missing tests, speed, and what to cut.",
     "codecraft-audit": "Audit the whole repo: bugs, security, load, missing tests, speed, and what to cut.",
     "codecraft-debt": "List every deliberate `shortcut:` comment and its upgrade path.",
@@ -25,7 +20,7 @@ SKILL_COMMANDS = {
 
 ROOT = Path(__file__).resolve().parent
 SKILLS_DIR = ROOT / "skills"
-PONYTAIL_SKILL = SKILLS_DIR / "ponytail" / "SKILL.md"
+CODECRAFT_SKILL = SKILLS_DIR / "codecraft" / "SKILL.md"
 
 _current_mode = None
 
@@ -46,7 +41,7 @@ def _config_dir() -> Path:
 
 
 def _default_mode() -> str:
-    env_mode = _normalize_runtime_mode(os.environ.get("CODECRAFT_DEFAULT_MODE", os.environ.get("PONYTAIL_DEFAULT_MODE")))
+    env_mode = _normalize_runtime_mode(os.environ.get("CODECRAFT_DEFAULT_MODE", os.environ.get("CODECRAFT_DEFAULT_MODE")))
     if env_mode:
         return env_mode
     try:
@@ -77,7 +72,7 @@ def _filter_skill_body_for_mode(body: str, mode: str) -> str:
         # this, an ordinary rule bullet that happens to start with a mode word
         # (e.g. "- Full: ...") is silently dropped in every other mode — it looks
         # like a worked example but is really prose meant to survive verbatim.
-        # Mirrors the fix in hooks/ponytail-instructions.js (#571).
+        # Mirrors the fix in hooks/codecraft-instructions.js (#571).
         example_label = re.match(r'^-\s*([^:]+):\s*"', line)
         if example_label:
             label_mode = _normalize_runtime_mode(example_label.group(1))
@@ -107,7 +102,7 @@ def build_injected_context(mode: str | None = None) -> str:
     if effective == "off":
         return ""
     try:
-        body = PONYTAIL_SKILL.read_text(encoding="utf-8")
+        body = CODECRAFT_SKILL.read_text(encoding="utf-8")
         return f"CODECRAFT MODE ACTIVE — level: {effective}\n\n{_filter_skill_body_for_mode(body, effective)}"
     except OSError:
         return _fallback_instructions(effective)
@@ -118,7 +113,7 @@ def _pre_llm_call(
 ) -> dict[str, str] | None:
     mode = _current_mode or _default_mode()
     # Off is injected too: the ruleset from an earlier turn is replayed every turn,
-    # and the /ponytail off reply goes to the user, never to the model.
+    # and the /codecraft off reply goes to the user, never to the model.
     context = build_injected_context(mode) or "CODECRAFT MODE OFF"
 
     # Hermes persists hook context in api_content for cache-stable replay.
@@ -160,7 +155,7 @@ def _slash_access_denied(event: Any, gateway: Any, command: str) -> bool:
 
 
 def rewrite_gateway_command(event: Any = None, gateway: Any = None, **_: Any) -> dict[str, str] | None:
-    """Rewrite authorized gateway /ponytail-* commands into normal agent prompts."""
+    """Rewrite authorized gateway /codecraft-* commands into normal agent prompts."""
     text = str(getattr(event, "text", "") or "").strip()
     if not text.startswith("/"):
         return None
@@ -181,7 +176,7 @@ def _handle_mode_command(raw_args: str) -> str:
     global _current_mode
     arg = (raw_args or "").strip().lower()
     if not arg:
-        # Bare /ponytail switches ponytail on, or reports the level when it already is (#639).
+        # Bare /codecraft switches codecraft on, or reports the level when it already is (#639).
         mode = _current_mode or _default_mode()
         if mode != "off":
             return f"CodeCraft mode: {mode}. Use `/codecraft lite|full|ultra|off`."
@@ -219,7 +214,7 @@ def register(ctx: Any) -> None:
     ctx.register_hook("pre_llm_call", _pre_llm_call)
     ctx.register_hook("pre_gateway_dispatch", rewrite_gateway_command)
 
-    for name in ("codecraft", "ponytail"):
+    for name in ("codecraft",):
         ctx.register_command(
             name,
             _handle_mode_command,

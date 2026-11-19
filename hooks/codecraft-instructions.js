@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Shared Ponytail instruction builder for Claude hooks and Pi extension.
+// Shared CodeCraft instruction builder for Claude hooks and Pi extension.
 
 const fs = require('fs');
 const path = require('path');
@@ -74,7 +74,7 @@ function getFallbackInstructions(mode) {
     "Never cut: validation at trust boundaries, error handling that prevents data loss, security, accessibility, the calibration real hardware needs, anything the user asked for.\n";
 }
 
-function getPonytailInstructions(mode) {
+function getCodecraftInstructions(mode) {
   const configuredMode = normalizePersistedMode(mode) || DEFAULT_MODE;
 
   if (INDEPENDENT_MODES.has(configuredMode)) {
@@ -94,5 +94,5 @@ function getPonytailInstructions(mode) {
 module.exports = {
   filterSkillBodyForMode,
   getFallbackInstructions,
-  getPonytailInstructions,
+  getCodecraftInstructions,
 };

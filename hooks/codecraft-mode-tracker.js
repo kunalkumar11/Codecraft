@@ -19,7 +19,7 @@ const {
   setMode,
   writeHookOutput,
 } = require('./codecraft-runtime');
-const { getPonytailInstructions } = require('./codecraft-instructions');
+const { getCodecraftInstructions } = require('./codecraft-instructions');
 
 let input = '';
 let done = false;
@@ -146,7 +146,7 @@ function finish() {
           writeHookOutput(
             'UserPromptSubmit',
             mode,
-            (isCodex || isCursor) ? header + '\n\n' + getPonytailInstructions(mode) : header,
+            (isCodex || isCursor) ? header + '\n\n' + getCodecraftInstructions(mode) : header,
           );
         }
       } else if (mode === 'off') {
@@ -187,7 +187,7 @@ function finish() {
         const header = (defaultNotice ? defaultNotice + '\n\n' : '') + (modeSwitched
           ? 'CODECRAFT MODE CHANGED — level: ' + currentMode + '\n\n'
           : '');
-        writeHookOutput('UserPromptSubmit', currentMode, header + getPonytailInstructions(currentMode));
+        writeHookOutput('UserPromptSubmit', currentMode, header + getCodecraftInstructions(currentMode));
       } else if (defaultNotice) {
         writeHookOutput('UserPromptSubmit', currentMode, defaultNotice);
       }
